@@ -1,0 +1,24 @@
+{
+  "name": "shipwright",
+  "id": "shipwright",
+  "owner": {
+    "name": "RudreshNarwal"
+  },
+  "metadata": {
+    "description": "Shipwright — drive a requirement end-to-end to a reviewed, QA'd, shipped PR.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "shipwright",
+      "source": "./",
+      "description": "End-to-end development pipeline with evidence-rich finalize and ship.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Rudresh Narwal"
+      },
+      "keywords": ["workflow", "pipeline", "tdd", "qa", "ship"],
+      "category": "workflow"
+    }
+  ]
+}

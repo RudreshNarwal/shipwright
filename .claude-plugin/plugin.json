@@ -1,0 +1,21 @@
+{
+  "name": "shipwright",
+  "description": "End-to-end development pipeline: brainstorm -> plan -> build (TDD, subagents) -> review -> browser QA (UI + API) -> evidence-rich finalize -> ship. Hand it a requirement, get back a PR with proof.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Rudresh Narwal"
+  },
+  "homepage": "https://github.com/RudreshNarwal/shipwright",
+  "repository": "https://github.com/RudreshNarwal/shipwright",
+  "license": "MIT",
+  "keywords": [
+    "workflow",
+    "pipeline",
+    "tdd",
+    "qa",
+    "code-review",
+    "autonomous",
+    "end-to-end",
+    "ship"
+  ]
+}
