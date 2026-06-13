@@ -72,11 +72,9 @@ redoing finished work.
 /plugin install shipwright
 ```
 
-Then install the one dependency that can't be bundled:
-
-```bash
-bash ~/.claude/plugins/.../shipwright/scripts/install-gstack.sh   # or the one-liner below
-```
+Then install the one dependency that can't be bundled (gstack) — see
+[Installing gstack manually](#installing-gstack-manually) below, or run
+`scripts/install-gstack.sh` from a clone of this repo.
 
 ### Option B — copy the skills
 
