@@ -27,6 +27,13 @@ every subagent prompt.
 
 ## The pipeline
 
+<p align="center">
+  <img alt="Shipwright pipeline — requirement through preflight, brainstorm, plan, build, review, QA, finalize, to a PR with proof, with a Phase-5 escalation loop back to plan/brainstorm" src="assets/flow.svg" width="560">
+</p>
+
+<details>
+<summary>Text version</summary>
+
 ```
 requirement
     │
@@ -55,6 +62,8 @@ requirement
     ▼
    PR with proof
 ```
+
+</details>
 
 Already have a spec or a plan? Shipwright's **entry map** starts you at the right phase instead of
 redoing finished work.
