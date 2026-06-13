@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Shipwright — wrench-and-hull concept">
+  <!-- ALTERNATE CONCEPT C: evolve the wrench (the old 🛠️) into a hull — a wrench rising
+       as the mast from a ship's hull on a waterline. -->
+  <defs>
+    <linearGradient id="sw-wh" x1="12" y1="60" x2="52" y2="10" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0EA5A0"/>
+      <stop offset="1" stop-color="#22C55E"/>
+    </linearGradient>
+  </defs>
+  <!-- hull -->
+  <path d="M12 38 L52 38 L45 53 Q32 59 19 53 Z" fill="#0F172A"/>
+  <!-- hull ribs -->
+  <g stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" opacity="0.5">
+    <line x1="24" y1="40" x2="25" y2="51"/>
+    <line x1="32" y1="40" x2="32" y2="53"/>
+    <line x1="40" y1="40" x2="39" y2="51"/>
+  </g>
+  <!-- waterline -->
+  <g stroke="#0EA5A0" stroke-linecap="round" opacity="0.45">
+    <line x1="8"  y1="58" x2="24" y2="58" stroke-width="3"/>
+    <line x1="30" y1="58" x2="44" y2="58" stroke-width="3"/>
+  </g>
+  <!-- wrench mast: handle + open-end head -->
+  <rect x="29.5" y="16" width="5" height="22" rx="2.5" fill="url(#sw-wh)"/>
+  <path d="M32 6 a7 7 0 1 1 -5 11.9 l3.2 -3.4 a2.5 2.5 0 1 0 1.8 -4.2 Z" fill="url(#sw-wh)"/>
+</svg>

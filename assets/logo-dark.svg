@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 120" width="480" height="120" role="img" aria-label="Shipwright — hand it a requirement, get back a PR with proof">
+  <!-- Horizontal lockup tuned for DARK backgrounds (near-white wordmark, lighter ribs). -->
+  <defs>
+    <linearGradient id="sw-hull" x1="8" y1="56" x2="56" y2="8" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2DD4BF"/>
+      <stop offset="1" stop-color="#4ADE80"/>
+    </linearGradient>
+  </defs>
+  <!-- mark (64x64 art) -->
+  <g transform="translate(6,28)">
+    <g stroke="#2DD4BF" stroke-linecap="round" opacity="0.5">
+      <line x1="7"  y1="53" x2="22" y2="53" stroke-width="3"/>
+      <line x1="28" y1="53" x2="41" y2="53" stroke-width="3"/>
+    </g>
+    <g stroke="#E2E8F0" stroke-width="2.4" stroke-linecap="round" opacity="0.85">
+      <line x1="20" y1="24" x2="20" y2="39"/>
+      <line x1="28" y1="20" x2="28" y2="45"/>
+      <line x1="36" y1="24" x2="36" y2="39"/>
+    </g>
+    <path d="M11 28 C 13 41, 21 47, 30 45 C 37 43, 41 37, 44 30 L 57 9"
+          fill="none" stroke="url(#sw-hull)" stroke-width="8"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- wordmark -->
+  <text x="92" y="62" font-family="'Inter','Segoe UI','Helvetica Neue',Arial,sans-serif"
+        font-size="46" font-weight="700" letter-spacing="-1.2" fill="#F1F5F9">Shipwright</text>
+  <text x="94" y="90" font-family="'Inter','Segoe UI','Helvetica Neue',Arial,sans-serif"
+        font-size="15.5" font-weight="500" letter-spacing="0.1" fill="#94A3B8">Hand it a requirement. Get back a PR with proof.</text>
+</svg>

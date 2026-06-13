@@ -1,8 +1,11 @@
-# Example finalize report
+# Example finalize report (template)
 
-> ⚠️ **Illustrative sample, not a real captured run.** This shows the *shape* of what Shipwright's
-> Phase 6 produces so you know what to expect. Before the public launch, replace it with a real
-> report from running the pipeline on a small sample feature — including actual screenshots in
-> `assets/` and a real per-stage cost table from `cost-table.py`. The numbers below are made up.
+> 📋 **This is a template showing the *shape* of a Shipwright Phase-6 report — not a captured run.**
+> Every value is a `<placeholder>`; nothing here is a real or invented measurement. A real run writes
+> its report to `docs/finalize/YYYY-MM-DD-<branch>.md` and fills these in from actual tests, gstack
+> `/qa`, screenshots, and `cost-table.py`.
+>
+> To showcase a real run, run the pipeline on a small feature and drop the resulting report — with
+> real screenshots in `assets/` — here.
 
-See [`2026-06-13-example-feature.md`](./2026-06-13-example-feature.md) for the report itself.
+See [`TEMPLATE-finalize-report.md`](./TEMPLATE-finalize-report.md) for the template itself.

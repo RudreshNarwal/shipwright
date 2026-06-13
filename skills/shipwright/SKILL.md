@@ -34,17 +34,16 @@ Don't redo phases whose output already exists. Artifacts in repo conventions (e.
 
 ## Phase 0 — Preflight (run once, before anything)
 
-Shipwright bundles its superpowers and karpathy sub-skills (vendored under `shipwright:`), but the
-browser-QA and ship phases call **gstack**, which is a separate product and cannot be bundled.
-Before starting, verify the external dependencies:
+Shipwright bundles its superpowers, karpathy, and frontend-design sub-skills (vendored under
+`shipwright:`), but the browser-QA and ship phases call **gstack**, which is a separate product and
+cannot be bundled. Before starting, verify the external dependency:
 
 - **gstack** — required for Phases 5–6 (`/qa`, `/qa-only`, `/browse`, `/design-review`, `/autoplan`,
   `/ship`, `/setup-browser-cookies`). Check it's installed (e.g. `~/.claude/skills/gstack/` exists,
   or `/qa` resolves). Missing → tell the user to run `scripts/install-gstack.sh` from this repo (or
   the one-liner in the README) and STOP until it's installed.
-- **frontend-design** — required only if the work touches `web/` / UI. It's an Anthropic plugin
-  skill, not bundled. Missing and the task is frontend → tell the user to install it and STOP;
-  backend-only task → continue.
+- **frontend-design** — required only for `web/` / UI work, and it's now **bundled** (vendored under
+  `shipwright:frontend-design`), so there is nothing to install for UI work.
 
 If the dependency is genuinely unavailable and cannot be installed (e.g. no network in a sandbox),
 say so plainly and stop — do not silently skip QA or ship.
@@ -84,7 +83,9 @@ When the spec is approved, ask one batched question with two parts:
 | Build mode (P3) | subagent-driven; `executing-plans` if ≤3 sequential tasks |
 | Mid-run ambiguity | safer interpretation, logged in the finalize report |
 | Second opinions (P4) | skip `/codex`; `requesting-code-review` stays mandatory |
-| QA bugs (P5) | fix all; defer only with a logged reason |
+| QA local bug (P5) | fix all in place; defer only with a logged reason |
+| QA architecture/design re-plan (P5, same scope) | auto loop-back via `/autoplan`, re-build the affected slice, re-QA; logged in the report |
+| QA product/scope flaw (P5) | **STOP and surface** — never silently re-scope (see Phase 5 triage) |
 | Missing QA credentials | env / creds file / gate answer; else self-register a test account (non-prod only); signup impossible → STOP and report |
 | Soft gate fails (P6) | STOP and report — never ship failures autonomously |
 | Close-out (P6) | `/ship` → PR (never merge the main branch directly) |
@@ -110,7 +111,7 @@ Autonomous mode removes *questions to the user*, not harness permissions — pai
      minimal one for the new code (e.g. pytest for Django, vitest for Vue; smoke-level is enough).
      Only if setup would dwarf the feature itself, record an explicit no-harness exception that
      Finalize must surface.
-   - Frontend tasks (components, pages, styling, `web/`) also invoke `frontend-design`.
+   - Frontend tasks (components, pages, styling, `web/`) also invoke `shipwright:frontend-design`.
    - **Every subagent prompt MUST embed the karpathy discipline** — fresh subagents don't inherit
      this context. Tell each implementer: state your assumptions in your report; if the task is
      ambiguous, return the question instead of guessing; minimum code; touch only what the task
@@ -127,15 +128,47 @@ Autonomous mode removes *questions to the user*, not harness permissions — pai
    - `browse console --errors` after every interaction.
    - Frontend work → also invoke gstack `/design-review` (visual/theme consistency vs the app's design system).
    - Resolve credentials here (see Credentials).
-   *Verify:* health score recorded; every bug fixed or explicitly deferred with reason.
+   *Verify:* health score recorded; every finding fixed, escalated (below), or explicitly deferred
+   with reason.
 6. **Finalize + Ship** — run Enhanced Finalize below.
+
+### Phase 5 — Triage & escalation (when a finding is bigger than a local fix)
+
+`/qa` and `/design-review` fix things *in place*. But some findings mean an earlier phase was wrong —
+the code is doing what the plan said, and the plan (or the spec) is the problem. Don't band-aid those.
+Triage **every** QA finding into one class and take its route:
+
+| Class | Route |
+|---|---|
+| **Local bug (FE or BE)** — fixable within the current plan/scope | Fix in place via `/qa` loop. Cosmetic visual → `/design-review` in-place fix. (Current behavior.) |
+| **Architecture / eng flaw** — fixing it means changing the plan, not just the code | **Loop back to Phase 2** for the affected slice: `shipwright:writing-plans` + `/plan-eng-review` (or `/autoplan`), then re-Build (3) → re-Review (4) → re-QA (5) **that slice only**. |
+| **Design / UX flaw beyond cosmetic** — the interaction model or layout is fundamentally off | **Loop back to Phase 2** via `/plan-design-review`, then re-Build the affected UI. (Distinct from the in-place `/design-review`.) |
+| **Product / scope flaw** — QA shows we built the wrong thing, or the spec itself is wrong | **Loop back to Phase 1** to re-scope via `/plan-ceo-review`. This is a scope change. |
+
+**Who decides — the human-intervention model:**
+
+- **Interactive mode:** any finding that exceeds a local fix → **STOP and ask the user before fixing
+  or looping back.** Present the finding, the evidence (the `browse network` / `console --errors`
+  capture), and the recommended route. Let them choose: fix-and-loop-back / defer / abandon.
+- **Autonomous mode:** automatic — architecture and design re-plans (same scope) loop back through
+  `/autoplan` and re-build the affected slice with zero questions. The **one** exception: a genuine
+  **product / scope redefinition STOPs and surfaces** to the user (you cannot silently change what the
+  product *is* — same spirit as the Phase 6 soft gate and the "don't assume" rule).
+
+**Loop-back discipline:**
+
+- **Surgical** — re-plan / re-build / re-QA only the affected slice, never the whole feature.
+- **Bounded** — the *same* finding escalating a second time → STOP regardless of mode, and surface it.
+- **Logged** — each loop-back appends a fresh cost-stage marker (e.g.
+  `{"stage": "2. Plan (re-entry: QA escalation)", ...}`) to `.claude/finalize-stages.jsonl`, and the
+  finalize report records: finding → route taken → what changed.
 
 **REQUIRED SUB-SKILLS:** `shipwright:brainstorming`, `shipwright:writing-plans`,
 `shipwright:test-driven-development`, `shipwright:subagent-driven-development`,
 `shipwright:requesting-code-review`, `shipwright:receiving-code-review`,
 `shipwright:executing-plans`, `shipwright:systematic-debugging`,
 `shipwright:verification-before-completion`, `shipwright:finishing-a-development-branch`,
-`shipwright:karpathy-guidelines`, `frontend-design`, and gstack `/qa`, `/qa-only`,
+`shipwright:karpathy-guidelines`, `shipwright:frontend-design`, and gstack `/qa`, `/qa-only`,
 `/browse`, `/design-review`, `/autoplan`, `/ship`, `/setup-browser-cookies`.
 
 ## Phase 6 — Enhanced Finalize
@@ -204,6 +237,9 @@ No per-phase cost API exists, so attribute it from session transcripts:
 - Redoing a phase whose artifact already exists (see Entry map) — enter at the right phase.
 - Silently picking one interpretation of an ambiguous requirement — present options or ask.
 - UI-only QA: screenshots look fine while the API returns 4xx/5xx — `browse network` is mandatory.
+- Band-aiding a symptom in QA when the finding means the plan was wrong — triage it and escalate
+  (Phase 5 triage table), don't patch around a broken plan.
+- Re-running the WHOLE pipeline on a loop-back instead of just the affected slice — escalation is surgical.
 - Forgetting a stage marker → the cost table loses that phase.
 - Running `/qa` (fix loop) in Finalize instead of `/qa-only` → Finalize must not mutate code.
 - Running both `/ship` and `finishing-a-development-branch` → pick one.

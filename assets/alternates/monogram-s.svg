@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Shipwright — monogram S concept">
+  <!-- ALTERNATE CONCEPT B: monogram "S" whose curves read as a ship's hull / prow on a waterline. -->
+  <defs>
+    <linearGradient id="sw-s" x1="14" y1="56" x2="50" y2="8" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0EA5A0"/>
+      <stop offset="1" stop-color="#22C55E"/>
+    </linearGradient>
+  </defs>
+  <path d="M46 18 C 46 9, 18 9, 18 21 C 18 31, 46 29, 46 41 C 46 53, 18 53, 18 43"
+        fill="none" stroke="url(#sw-s)" stroke-width="8" stroke-linecap="round"/>
+  <g stroke="#0EA5A0" stroke-linecap="round" opacity="0.45">
+    <line x1="10" y1="58" x2="26" y2="58" stroke-width="3"/>
+    <line x1="32" y1="58" x2="46" y2="58" stroke-width="3"/>
+  </g>
+</svg>

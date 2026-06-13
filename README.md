@@ -1,6 +1,16 @@
-# 🛠️ Shipwright
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.svg">
+    <img alt="Shipwright — hand it a requirement, get back a PR with proof" src="assets/logo-light.svg" width="460">
+  </picture>
+</p>
 
-**Hand it a requirement. Get back a PR with proof.**
+<p align="center">
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-22C55E.svg"></a>
+  <a href="https://github.com/RudreshNarwal/shipwright/actions/workflows/lint.yml"><img alt="CI" src="https://github.com/RudreshNarwal/shipwright/actions/workflows/lint.yml/badge.svg"></a>
+  <img alt="Version 0.1.0" src="https://img.shields.io/badge/version-0.1.0-0EA5A0.svg">
+  <img alt="Claude Code plugin" src="https://img.shields.io/badge/Claude%20Code-plugin-0F172A.svg">
+</p>
 
 Shipwright is a [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skill that drives a
 feature or bugfix through a disciplined, end-to-end pipeline — brainstorm, plan, build with TDD,
@@ -21,23 +31,24 @@ every subagent prompt.
 requirement
     │
     ▼
-[0] Preflight ──── verify gstack + frontend-design are installed
+[0] Preflight ──── verify gstack is installed (superpowers + karpathy + frontend-design are bundled)
     │
     ▼
-[1] Brainstorm ─── shipwright:brainstorming → approved spec
-    │              └─▶ Autonomy gate: "run the rest autonomously?" + QA credentials
-    ▼
-[2] Plan ───────── shipwright:writing-plans (+ gstack /autoplan review when autonomous)
-    │
-    ▼
-[3] Build ──────── shipwright:subagent-driven-development · TDD per task · frontend-design for UI
+[1] Brainstorm ─── shipwright:brainstorming → approved spec          ◀─┐
+    │              └─▶ Autonomy gate: "run autonomously?" + QA creds   │
+    ▼                                                                  │ re-scope
+[2] Plan ───────── shipwright:writing-plans (+ /autoplan when auto)  ◀─┤
+    │                                                                  │ re-plan / re-design
+    ▼                                                                  │
+[3] Build ──────── shipwright:subagent-driven-development · TDD · shipwright:frontend-design for UI
     │              karpathy discipline embedded in every subagent prompt
-    ▼
+    ▼                                                                  │
 [4] Review ─────── shipwright:requesting-code-review + receiving-code-review (+ /review, /codex)
-    │
-    ▼
-[5] QA ─────────── gstack /qa  ·  browse network (API returns 2xx)  ·  console --errors  ·  /design-review
-    │
+    │                                                                  │
+    ▼                                                                  │
+[5] QA ─────────── gstack /qa · browse network (API 2xx) · console --errors · /design-review
+    │              └─ finding bigger than a local fix? escalate ───────┘
+    │                 (interactive: confirm first · autonomous: auto, scope-change stops)
     ▼
 [6] Finalize ───── report + screenshots + per-stage cost table → soft gate → gstack /ship → PR
     │
@@ -103,17 +114,18 @@ Phase 0 checks for these before doing anything and stops with instructions if th
 approved you'll be asked once whether to continue autonomously and for any QA login credentials
 (leave blank and it self-registers a throwaway test account against non-prod targets).
 
-See [`docs/example-report/`](./docs/example-report/) for what a finished run produces.
+See [`docs/example-report/`](./docs/example-report/) for a template of the report Phase 6 produces.
 
 ## What's bundled
 
-Shipwright vendors a pinned, MIT-licensed snapshot of the skills it orchestrates, so it installs as
-one self-contained plugin. gstack is the exception — it's a separate product you install once. Full
-provenance and versions are in [`VENDORED.md`](./VENDORED.md).
+Shipwright vendors a pinned, permissively-licensed snapshot of the skills it orchestrates (all MIT,
+plus one Apache-2.0 skill — `frontend-design`), so it installs as one self-contained plugin. gstack is
+the exception — it's a separate product you install once. Full provenance and versions are in
+[`VENDORED.md`](./VENDORED.md).
 
 ## Credits
 
-Shipwright stands on the shoulders of three excellent open-source projects:
+Shipwright stands on the shoulders of four excellent open-source projects:
 
 - **[superpowers](https://github.com/obra/superpowers)** by Jesse Vincent (MIT) — brainstorming,
   planning, TDD, subagent-driven development, code review, debugging, verification.
@@ -121,8 +133,19 @@ Shipwright stands on the shoulders of three excellent open-source projects:
   review, autoplan, and ship tooling.
 - **[andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills)** by forrestchang
   (MIT) — the behavioral guidelines that anchor the discipline.
+- **[frontend-design](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/frontend-design)**
+  by Anthropic (Apache-2.0) — the frontend design skill used for UI work.
 
-## License
+## License & attribution
 
-MIT © 2026 Rudresh Narwal. Vendored skills retain their upstream MIT licenses (see
-[`licenses/`](./licenses/)).
+Shipwright itself is **MIT © 2026 Rudresh Narwal**.
+
+It bundles, verbatim and version-pinned, skills under two permissive licenses — **MIT** (superpowers,
+andrej-karpathy-skills) and **Apache-2.0** (`frontend-design`, © Anthropic). Each upstream's full
+license text is preserved in [`licenses/`](./licenses/), and provenance is documented in
+[`VENDORED.md`](./VENDORED.md). The Apache-2.0 skill remains under Apache-2.0; bundling it does not
+relicense it.
+
+> **Not affiliated with Anthropic.** "Claude" and "Claude Code" are trademarks of Anthropic.
+> Shipwright is an independent, community plugin *for* Claude Code — it is not built, owned, or
+> endorsed by Anthropic.

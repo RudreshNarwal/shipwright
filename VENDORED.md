@@ -1,10 +1,10 @@
 # Vendored skills — provenance
 
-Shipwright bundles a pinned snapshot of several MIT-licensed skills so it installs as one
-self-contained plugin. Each skill below was copied verbatim from its upstream source on
-**2026-06-13**, then had its internal skill references re-namespaced from the upstream prefix
-to `shipwright:` (so they resolve to the bundled copies regardless of what else you have
-installed). No logic was changed.
+Shipwright bundles a pinned snapshot of several permissively-licensed skills so it installs as one
+self-contained plugin — all MIT, plus one Apache-2.0 (`frontend-design`). Each skill below was copied
+verbatim from its upstream source on **2026-06-13**, then had its internal skill references
+re-namespaced from the upstream prefix to `shipwright:` (so they resolve to the bundled copies
+regardless of what else you have installed). No logic was changed.
 
 Upstream license texts are preserved in [`licenses/`](./licenses/). Re-sync a newer upstream
 version with [`scripts/sync-vendored.sh`](./scripts/sync-vendored.sh).
@@ -34,6 +34,14 @@ version with [`scripts/sync-vendored.sh`](./scripts/sync-vendored.sh).
   and ships `scripts/install-gstack.sh` to install it. Used in Phases 5–6
   (`/qa`, `/qa-only`, `/browse`, `/design-review`, `/autoplan`, `/ship`, `/setup-browser-cookies`).
 
-## frontend-design — NOT vendored (optional runtime dependency)
+## frontend-design — Apache-2.0 © Anthropic
 
-- An Anthropic Claude Code plugin skill. Required only for frontend/UI work. Install separately.
+- Source: https://github.com/anthropics/claude-plugins-official/tree/main/plugins/frontend-design
+  (distributed via the `claude-plugins-official` marketplace)
+- Version pinned: commit **`ac16ffafcd70`** (no version field is published; date-pinned 2026-06-13)
+- License: **Apache-2.0** (`licenses/frontend-design.LICENSE`) — the one non-MIT bundled skill;
+  Apache-2.0 is permissive and redistributable inside this MIT repo with its license text preserved.
+  No `NOTICE` file exists upstream. Copied verbatim with no namespace references and no changes
+  (so there is nothing to state under Apache-2.0 §4).
+- Skills vendored: `frontend-design` (referenced as `shipwright:frontend-design`). Required only for
+  frontend/UI work.
