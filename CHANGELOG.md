@@ -7,6 +7,29 @@ All notable changes to Shipwright are documented here. The format is based on
 ## [Unreleased]
 
 ### Added
+- **One-command gstack bootstrapper + auto-detect.** `scripts/install-gstack.sh` now installs the whole
+  chain — **Bun** (if missing), the **gstack** clone + `./setup`, and **Playwright's Chromium** — and
+  takes `--yes` for unattended runs. A new `SessionStart` hook (`hooks/hooks.json` →
+  `scripts/preflight-gstack.sh`) auto-detects gstack on session start: silent when present, a one-line
+  install message when missing, and an opt-in background install when `SHIPWRIGHT_AUTO_INSTALL_GSTACK=1`
+  is set (opt-in by design — it pulls ~1 GB plus a browser, so it isn't silent by default).
+- **Branded pipeline diagram.** `assets/flow.svg` now carries the Shipwright logo lockup (hull→checkmark
+  mark + wordmark + tagline) over the brand-palette flow.
+- **Minimal-code build ladder in the Build phase.** Each implementer subagent is now given an explicit
+  ladder to run before writing code (does this need to exist → stdlib → native platform feature →
+  already installed → one line → only then a minimal solution), with a guardrail never to trade away
+  security/accessibility/data-loss safety for brevity. Inspired by
+  [ponytail](https://github.com/DietrichGebert/ponytail) (MIT); complements the bundled karpathy rules
+  rather than restating them. Credited in the README (inspiration, not vendored).
+- **Benchmark harness (`benchmarks/`).** A control-vs-treatment harness that measures the build
+  discipline's effect on generated code — same model and tasks, with the discipline injected into the
+  treatment arm only. Captures exact LOC/files/deps/tokens (reusing `cost-table.py`) and a flagged
+  dollar estimate, reports medians with spread and pass-rates, and enforces an honest publish gate
+  (N≥10 across ≥5 tasks, matched pass-rates) before any number may reach the README.
+- **README sections** — *How it works*, *Before / after* (narrative, no fabricated metrics), *Numbers*
+  (honest placeholder pending real benchmark runs), and an *FAQ* including an opencode / other-tool
+  compatibility note (Phases 1–4 likely workable on opencode; gstack and the transcript cost table are
+  the blockers).
 - **Dynamic per-model cost pricing in `cost-table.py`.** Rates are now looked up per model from
   LiteLLM's community price list (the source `ccusage` uses), fetched once and cached 24h under
   `~/.cache/shipwright/`. Any model missing from the live data falls back to the bundled static table;

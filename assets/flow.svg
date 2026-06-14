@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 624" width="720" height="624" role="img"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -96 720 720" width="720" height="720" role="img"
      aria-label="Shipwright pipeline: requirement → preflight → brainstorm → plan → build → review → QA → finalize → PR with proof, with a Phase-5 escalation loop back to plan/brainstorm.">
   <defs>
     <linearGradient id="sw-g" x1="0" y1="1" x2="1" y2="0">
@@ -15,6 +15,24 @@
       .escs{ font-weight: 500; font-size: 10.5px; fill: #64748B; }
     </style>
   </defs>
+
+  <!-- ===== brand header: Shipwright logo lockup (mark + wordmark + tagline) ===== -->
+  <g transform="translate(243,-84)">
+    <g stroke="#0EA5A0" stroke-linecap="round" opacity="0.45">
+      <line x1="7"  y1="53" x2="22" y2="53" stroke-width="3"/>
+      <line x1="28" y1="53" x2="41" y2="53" stroke-width="3"/>
+    </g>
+    <g stroke="#0F172A" stroke-width="2.4" stroke-linecap="round" opacity="0.92">
+      <line x1="20" y1="24" x2="20" y2="39"/>
+      <line x1="28" y1="20" x2="28" y2="45"/>
+      <line x1="36" y1="24" x2="36" y2="39"/>
+    </g>
+    <path d="M11 28 C 13 41, 21 47, 30 45 C 37 43, 41 37, 44 30 L 57 9"
+          fill="none" stroke="url(#sw-g)" stroke-width="8"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text class="t" x="314" y="-46" font-size="30" font-weight="700" letter-spacing="-0.8" fill="#0F172A">Shipwright</text>
+  <text class="t" x="360" y="-16" font-size="11.5" font-weight="500" fill="#475569" text-anchor="middle">Hand it a requirement. Get back a PR with proof.</text>
 
   <!-- self-contained panel (readable on light or dark themes) -->
   <rect x="3" y="3" width="714" height="618" rx="18" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="2"/>
