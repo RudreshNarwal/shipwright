@@ -39,9 +39,11 @@ Shipwright bundles its superpowers, karpathy, and frontend-design sub-skills (ve
 cannot be bundled. Before starting, verify the external dependency:
 
 - **gstack** — required for Phases 5–6 (`/qa`, `/qa-only`, `/browse`, `/design-review`, `/autoplan`,
-  `/ship`, `/setup-browser-cookies`). Check it's installed (e.g. `~/.claude/skills/gstack/` exists,
-  or `/qa` resolves). Missing → tell the user to run `scripts/install-gstack.sh` from this repo (or
-  the one-liner in the README) and STOP until it's installed.
+  `/ship`, `/setup-browser-cookies`). A SessionStart hook (`hooks/hooks.json` →
+  `scripts/preflight-gstack.sh`) already auto-detects it at session start and, when missing, prints the
+  install command (or background-installs it if `SHIPWRIGHT_AUTO_INSTALL_GSTACK=1`). Re-check here
+  (e.g. `~/.claude/skills/gstack/` exists, or `/qa` resolves); still missing → tell the user to run
+  `scripts/install-gstack.sh` (it bootstraps Bun + gstack + Playwright) and STOP until it's installed.
 - **frontend-design** — required only for `web/` / UI work, and it's now **bundled** (vendored under
   `shipwright:frontend-design`), so there is nothing to install for UI work.
 
@@ -116,6 +118,12 @@ Autonomous mode removes *questions to the user*, not harness permissions — pai
      this context. Tell each implementer: state your assumptions in your report; if the task is
      ambiguous, return the question instead of guessing; minimum code; touch only what the task
      names. Treat a subagent report with unstated assumptions as a failed spec review.
+     - **Run the build ladder BEFORE writing code** (give each implementer this checklist; stop at
+       the first rung that answers the task): (1) **Does this need to exist at all?** — if not,
+       don't build it. (2) **Is it in the stdlib?** (3) **Is it a native platform feature?** (4) **Is
+       it already installed** — an existing dependency or repo util? (5) **Can it be one line?**
+       (6) **Only then** write the minimal working solution. Never trade away security,
+       accessibility, or data-loss safety to climb a rung — those are not optional.
    *Verify:* all plan tasks complete, tests green.
 4. **Review** — invoke `shipwright:requesting-code-review`; act on findings via
    `shipwright:receiving-code-review`. Optionally gstack `/review` or `/codex` for a second
@@ -257,7 +265,8 @@ No per-phase cost API exists, so attribute it from session transcripts:
 - Skipping the soft-gate confirmation when QA failed or tests were absent → always surface before shipping.
 - Asking the user questions mid-run in autonomous mode — the only valid stops are missing
   credentials and a failed soft gate.
-- Dispatching implementer subagents without the karpathy rules in their prompt — subagents
-  assume silently unless told to surface assumptions.
+- Dispatching implementer subagents without the karpathy rules — or the build ladder
+  (stdlib / platform / existing-dep / one-line checks before writing) — in their prompt; subagents
+  assume silently and over-build unless told otherwise.
 - Shipping over a failed soft gate in autonomous mode → STOP and report instead.
 - Self-registering a test account against a production URL → local/dev/staging only.
