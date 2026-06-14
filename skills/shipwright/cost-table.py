@@ -8,6 +8,8 @@ markers written to .claude/finalize-stages.jsonl during the run.
 Usage:
     python3 cost-table.py                 # auto-detect transcripts for $PWD
     python3 cost-table.py --transcript X  # explicit transcript .jsonl
+    python3 cost-table.py --offline       # skip the network; bundled rates only
+    python3 cost-table.py --refresh       # force-refresh the live pricing cache
     python3 cost-table.py --ccusage       # defer to `ccusage` if installed
 
 Output: a markdown table (printed to stdout) to paste into the finalize report.
@@ -17,8 +19,12 @@ entries from 30 min before the first marker onward are counted — this keeps
 resumed/compacted sessions (which write a new .jsonl) in the totals. Without
 markers, only the most recent transcript is used.
 
-NOTE: pricing is BEST-EFFORT. Rates below are USD per 1M tokens and must be kept
-current; long-context (>200k) tiers may cost more. Sanity-check against `/cost`.
+PRICING is DYNAMIC: per model, rates are looked up from LiteLLM's community price
+list (the source `ccusage` also uses), fetched once and cached for 24h under
+~/.cache/shipwright/. Any model not in the live data (e.g. a brand-new id) falls
+back to the bundled static table below. Token counts are EXACT (straight from the
+transcript); dollar costs are best-effort estimates — sanity-check against `/cost`.
+The header prints which pricing source was used for each model.
 """
 from __future__ import annotations
 
@@ -27,12 +33,23 @@ import json
 import re
 import subprocess
 import sys
+import urllib.error
+import urllib.request
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-# USD per 1,000,000 tokens. Ordered: first substring match on the model id wins.
-# Keep current — newer Opus (4.5+) is much cheaper than legacy Opus.
-PRICING: list[tuple[str, dict]] = [
+# --- Live pricing (LiteLLM community price list) ---------------------------
+LITELLM_URL = (
+    "https://raw.githubusercontent.com/BerriAI/litellm/main/"
+    "model_prices_and_context_window.json"
+)
+CACHE_PATH = Path.home() / ".cache" / "shipwright" / "model_prices.json"
+CACHE_TTL = timedelta(hours=24)
+FETCH_TIMEOUT = 10  # seconds
+
+# Bundled fallback. USD per 1,000,000 tokens. First substring match on the model
+# id wins. Used offline, or when a model isn't present in the live data.
+STATIC_PRICING: list[tuple[str, dict]] = [
     ("opus-4-8-fast", {"input": 10.0, "output": 50.0, "cache_write": 12.50, "cache_read": 1.00}),
     ("opus-4-8", {"input": 5.0,  "output": 25.0, "cache_write": 6.25,  "cache_read": 0.50}),
     ("opus-4-5", {"input": 5.0,  "output": 25.0, "cache_write": 6.25,  "cache_read": 0.50}),
@@ -46,20 +63,117 @@ DEFAULT_RATES = {"input": 3.0, "output": 15.0, "cache_write": 3.75, "cache_read"
 PRE_MARKER_GRACE = timedelta(minutes=30)
 
 
-def rates_for(model: str) -> dict:
+def _normalize_litellm(data: dict) -> dict[str, dict]:
+    """LiteLLM stores USD-per-token; convert to USD-per-1M to match STATIC_PRICING.
+
+    Anthropic's standard cache multipliers (write = 1.25x input, read = 0.10x input)
+    fill in any entry that omits explicit cache costs.
+    """
+    out: dict[str, dict] = {}
+    for key, v in data.items():
+        if not isinstance(v, dict):
+            continue
+        ipt, opt = v.get("input_cost_per_token"), v.get("output_cost_per_token")
+        if ipt is None or opt is None:
+            continue
+        inp = ipt * 1_000_000
+        cw = v.get("cache_creation_input_token_cost")
+        cr = v.get("cache_read_input_token_cost")
+        out[key.lower()] = {
+            "input": inp,
+            "output": opt * 1_000_000,
+            "cache_write": cw * 1_000_000 if cw is not None else inp * 1.25,
+            "cache_read": cr * 1_000_000 if cr is not None else inp * 0.10,
+        }
+    return out
+
+
+def _read_cache() -> tuple[dict | None, timedelta | None]:
+    try:
+        if CACHE_PATH.is_file():
+            mtime = datetime.fromtimestamp(CACHE_PATH.stat().st_mtime, timezone.utc)
+            age = datetime.now(timezone.utc) - mtime
+            return json.loads(CACHE_PATH.read_text()), age
+    except (OSError, ValueError):
+        pass
+    return None, None
+
+
+def _fetch_pricing() -> dict:
+    req = urllib.request.Request(LITELLM_URL, headers={"User-Agent": "shipwright-cost-table"})
+    with urllib.request.urlopen(req, timeout=FETCH_TIMEOUT) as resp:  # noqa: S310 (fixed https url)
+        raw = resp.read().decode("utf-8")
+    data = json.loads(raw)
+    try:
+        CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
+        CACHE_PATH.write_text(raw)
+    except OSError:
+        pass
+    return data
+
+
+def load_live_pricing(offline: bool = False, refresh: bool = False) -> tuple[dict[str, dict], str]:
+    """Return (model_id -> rates-per-1M, source label). Empty dict ⇒ static only."""
+    if offline:
+        return {}, "bundled static table (--offline)"
+    cached, age = (None, None) if refresh else _read_cache()
+    if cached is not None and age is not None and age < CACHE_TTL:
+        hours = int(age.total_seconds() // 3600)
+        return _normalize_litellm(cached), f"LiteLLM (cached {hours}h ago)"
+    try:
+        return _normalize_litellm(_fetch_pricing()), "LiteLLM (fetched just now)"
+    except (urllib.error.URLError, OSError, ValueError, TimeoutError) as exc:
+        if cached is not None:
+            return _normalize_litellm(cached), f"LiteLLM (stale cache; fetch failed: {type(exc).__name__})"
+        return {}, f"bundled static table (fetch failed: {type(exc).__name__})"
+
+
+def _canonical(model: str) -> list[str]:
+    """Model-id variants to try against the live keys: drop [..] suffixes and provider prefixes."""
+    m = (model or "").lower().strip()
+    out = [m]
+    stripped = re.sub(r"\[.*?\]", "", m)  # e.g. claude-opus-4-8[1m] -> claude-opus-4-8
+    if stripped != m:
+        out.append(stripped)
+    if "/" in stripped:  # e.g. anthropic/claude-... or us.anthropic.claude-...
+        out.append(stripped.split("/", 1)[1])
+    return out
+
+
+def _match_live(model: str, live: dict[str, dict]) -> dict | None:
+    if not model or not live:
+        return None
+    cands = _canonical(model)
+    for c in cands:  # exact first
+        if c in live:
+            return live[c]
+    best_key = None  # else longest live key that is a substring of the model id
+    for c in cands:
+        for key in live:
+            if key in c and (best_key is None or len(key) > len(best_key)):
+                best_key = key
+    return live[best_key] if best_key else None
+
+
+def rates_for(model: str, live: dict[str, dict]) -> tuple[dict, bool]:
+    """Return (rates-per-1M, is_live). Live data wins; else bundled table; else default."""
+    hit = _match_live(model, live)
+    if hit is not None:
+        return hit, True
     m = (model or "").lower()
-    for pattern, rates in PRICING:
+    for pattern, rates in STATIC_PRICING:
         if pattern in m:
-            return rates
-    return DEFAULT_RATES
+            return rates, False
+    return DEFAULT_RATES, False
 
 
 def family_of(model: str) -> str:
     m = (model or "").lower()
-    for pattern, _ in PRICING:
+    for pattern, _ in STATIC_PRICING:
         if pattern in m:
             return pattern
-    return "unknown"
+    cleaned = re.sub(r"\[.*?\]", "", m).split("/")[-1]
+    return cleaned or "unknown"
 
 
 def parse_ts(value: str | None) -> datetime | None:
@@ -144,6 +258,8 @@ def extract_usage(entry: dict) -> tuple[str, dict] | None:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--transcript", help="explicit transcript .jsonl path")
+    ap.add_argument("--offline", action="store_true", help="skip the network; bundled rates only")
+    ap.add_argument("--refresh", action="store_true", help="force-refresh the live pricing cache")
     ap.add_argument("--ccusage", action="store_true", help="defer to ccusage if installed")
     args = ap.parse_args()
 
@@ -154,6 +270,8 @@ def main() -> None:
         except FileNotFoundError:
             print("> ccusage not installed; falling back to transcript parsing.\n")
 
+    live, price_src = load_live_pricing(offline=args.offline, refresh=args.refresh)
+
     markers = load_stage_markers()
     transcripts = find_transcripts(args.transcript, bool(markers))
     window_start = markers[0][0] - PRE_MARKER_GRACE if markers else None
@@ -162,6 +280,8 @@ def main() -> None:
     # stage -> aggregates
     agg: dict[str, dict] = {}
     order: list[str] = [name for _, name in markers] or ["Whole session"]
+    priced_live: set[str] = set()
+    priced_fallback: set[str] = set()
 
     for transcript in transcripts:
         for raw in transcript.read_text().splitlines():
@@ -196,7 +316,7 @@ def main() -> None:
             out = usage.get("output_tokens", 0) or 0
             cr = usage.get("cache_read_input_tokens", 0) or 0
             cw = usage.get("cache_creation_input_tokens", 0) or 0
-            r = rates_for(model)
+            r, is_live = rates_for(model, live)
             a["input"] += inp
             a["output"] += out
             a["cache_read"] += cr
@@ -204,7 +324,9 @@ def main() -> None:
             a["cost"] += (inp * r["input"] + out * r["output"]
                           + cr * r["cache_read"] + cw * r["cache_write"]) / 1_000_000
             if model:
-                a["models"].add(family_of(model))
+                fam = family_of(model)
+                a["models"].add(fam)
+                (priced_live if is_live else priced_fallback).add(fam)
 
     if not agg:
         names = ", ".join(t.name for t in transcripts)
@@ -212,7 +334,13 @@ def main() -> None:
         return
 
     src = f"{len(transcripts)} transcripts" if multi else f"`{transcripts[0].name}`"
-    print(f"> Source: {src} · generated {datetime.now(timezone.utc).isoformat()}\n")
+    print(f"> Source: {src} · generated {datetime.now(timezone.utc).isoformat()}")
+    print(f"> Pricing: {price_src}.", end="")
+    if priced_live:
+        print(f" Live-priced: {', '.join(sorted(priced_live))}.", end="")
+    if priced_fallback:
+        print(f" Bundled-rate fallback (verify): {', '.join(sorted(priced_fallback))}.", end="")
+    print("\n> Token counts are exact; dollar costs are estimates — sanity-check against `/cost`.\n")
     print("| Stage | Model | Input | Output | Cache read | Cache write | Cost (USD) |")
     print("|---|---|---|---|---|---|---|")
     totals = {"input": 0, "output": 0, "cache_read": 0, "cache_write": 0, "cost": 0.0}

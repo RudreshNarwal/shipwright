@@ -175,15 +175,25 @@ Triage **every** QA finding into one class and take its route:
 
 Goal: durable proof the branch was checked thoroughly, then ship.
 
-1. **Summary** — build a task-done summary from `git diff` / commits vs the base branch.
-2. **Evidence** — invoke gstack `/qa-only` (report-only; phase 5 already fixed bugs) and `/browse` to
-   capture screenshots of key pages/flows into `docs/finalize/assets/<branch>/`, plus one
-   `browse network` capture of the core flow (proof the API layer was checked).
-   - Non-web repo / no app URL → skip browser steps, run the detected unit-test runner, note "no UI to screenshot."
-3. **Report** — write `docs/finalize/YYYY-MM-DD-<branch>.md` containing: task-done summary; test + QA
-   results (health score, pass/fail, issues); embedded screenshots (relative links); assumptions made
+1. **Summary & feature list** — build a task-done summary from `git diff` / commits vs the base branch,
+   and **enumerate the discrete features/slices** that were built (from the approved spec/plan). This
+   list drives the screenshots and the per-feature report sections below.
+2. **Evidence — one screenshot per feature** — invoke gstack `/qa-only` (report-only; Phase 5 already
+   fixed bugs) and `/browse` to capture **at least one screenshot per feature**, each demonstrating
+   that feature working — 2 features → 2 shots, 5 features → 5 shots — saved to
+   `docs/finalize/assets/<branch>/<feature-slug>.png`, plus one `browse network` capture of the core
+   flow (proof the API layer was checked). A feature with several flows may have more than one shot;
+   never fewer than one per feature.
+   - Non-web repo / no app URL → skip browser steps, run the detected unit-test runner, and capture the
+     feature's CLI/test output instead; note "no UI to screenshot" where genuinely nothing is visual.
+3. **Report** — write `docs/finalize/YYYY-MM-DD-<branch>.md` with: the **query** (the original
+   requirement, verbatim); a one-paragraph overall solution summary; then **one block per feature** —
+   *Query* (what was asked for this slice) · *Solution* (what was built) · *Screenshot* (the embedded
+   proof image for that feature, relative link) · *File changes* (the files touched for it). Follow
+   with: test + QA results (health score, pass/fail, issues, any Phase-5 escalations); assumptions made
    during the run; any no-harness exception; a "checked thoroughly" statement backed by the evidence;
-   and the per-stage cost table (below).
+   and the per-stage cost table (below). Lead numeric claims with token counts (exact); dollars are
+   estimates.
 4. **Soft gate** — tests failed, QA health low, or a no-harness exception exists → surface it
    prominently and require the user's explicit confirmation before shipping. Override allowed. Clean → proceed.
 5. **Commit** the report + screenshots to the branch (NEVER credentials), then **ship**: invoke

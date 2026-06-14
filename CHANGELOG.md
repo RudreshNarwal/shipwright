@@ -7,6 +7,12 @@ All notable changes to Shipwright are documented here. The format is based on
 ## [Unreleased]
 
 ### Added
+- **Dynamic per-model cost pricing in `cost-table.py`.** Rates are now looked up per model from
+  LiteLLM's community price list (the source `ccusage` uses), fetched once and cached 24h under
+  `~/.cache/shipwright/`. Any model missing from the live data falls back to the bundled static table;
+  `--offline` forces the bundled rates and `--refresh` busts the cache. The report header now states
+  which pricing source was used per model (live vs bundled fallback) and reminds that token counts are
+  exact while dollar costs are estimates. Removes the stale hand-maintained-only pricing.
 - **Phase 5 QA escalation / loop-back.** QA findings bigger than a local fix are now triaged
   (architecture → re-plan, design → re-design, scope → re-scope) and loop back to the right earlier
   phase for the affected slice only. Interactive mode asks for confirmation first; autonomous mode
