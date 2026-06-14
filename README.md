@@ -12,25 +12,46 @@
   <img alt="Claude Code plugin" src="https://img.shields.io/badge/Claude%20Code-plugin-0F172A.svg">
 </p>
 
-Shipwright is a [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skill that drives a
-feature or bugfix through a disciplined, end-to-end pipeline — brainstorm, plan, build with TDD,
-review, browser QA that checks the UI *and* the real API calls, an evidence-rich finalize report
-(screenshots + per-stage cost table), and a shipped pull request. It can run interactively, or
-**fully autonomously** from a single requirement after one approval.
+<p align="center"><b>Hand it a requirement, get back a PR with proof.</b></p>
 
-It's an orchestrator: each phase invokes a battle-tested skill and waits for it to finish. The
+**Shipwright** is a [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skill that drives a
+feature or bugfix from one sentence to a shipped pull request — through a disciplined, end-to-end
+pipeline that brainstorms, plans, builds with TDD, reviews, runs browser QA against the **real API**,
+writes an evidence-rich finalize report, and opens the PR. It runs interactively, or **fully
+autonomously** from a single requirement after one approval.
+
+No half-baked diffs. No skipped tests. No "works on my machine." Just high-quality,
+evidence-backed pull requests.
+
+It's an **orchestrator**: each phase invokes a battle-tested skill and waits for it to finish. The
 discipline comes from [Andrej Karpathy's rules for LLM coding](https://x.com/karpathy/status/2015883857489522876)
 — *don't assume, simplicity first, surgical changes, goal-driven* — propagated into every phase and
 every subagent prompt.
 
 ---
 
-## How it works
+## 🏗️ The Shipwright pipeline
 
-Hand Shipwright a requirement; it runs six fixed phases in order, each delegating to a battle-tested
-skill: **(1) Brainstorm → (2) Plan → (3) Build (TDD) → (4) Review → (5) browser + API QA →
-(6) Finalize + Ship.** A Phase-0 preflight checks dependencies first, and a Phase-5 finding that's
-bigger than a local fix loops back to the phase that owns it instead of patching forward.
+Shipwright doesn't just write code — it runs a strict engineering lifecycle, every time:
+
+```
+[🧠 Brainstorm] ➔ [📋 Plan] ➔ [🧪 TDD Build] ➔ [🔍 Review] ➔ [🌐 Browser+API QA] ➔ [📊 Finalize] ➔ [🚀 PR]
+```
+
+- **`0` 🔍 Preflight** — verifies dependencies before doing anything (gstack must be installed;
+  superpowers, karpathy, and frontend-design are bundled).
+- **`1` 🧠 Brainstorm** — deconstructs the requirement, maps edge cases, and agrees on an approach
+  → an **approved spec**.
+- **`2` 📋 Plan** — generates a detailed, step-by-step implementation plan *before* touching files
+  (auto-reviewed via `/autoplan` when running autonomously).
+- **`3` 🧪 Build (TDD)** — writes failing tests *first*, then the minimal clean code to pass them,
+  with Karpathy discipline injected into every subagent prompt and `frontend-design` for UI work.
+- **`4` 🔍 Review** — self-reviews the diff for correctness, security, and style (+ `/review`,
+  `/codex` for an adversarial second opinion).
+- **`5` 🌐 Browser + API QA** — drives a headless browser to verify the UI *and* asserts the real
+  API calls returned `2xx` via `browse network` (no blind mocking) — plus `/design-review`.
+- **`6` 📊 Finalize + 🚀 Ship** — produces a committed report (screenshots + per-stage cost table),
+  passes a soft gate, and opens a structured, review-ready pull request.
 
 <p align="center">
   <img alt="Shipwright pipeline — requirement through preflight, brainstorm, plan, build, review, QA, finalize, to a PR with proof, with a Phase-5 escalation loop back to plan/brainstorm" src="assets/flow.svg" width="560">
@@ -71,9 +92,65 @@ requirement
 </details>
 
 Already have a spec or a plan? Shipwright's **entry map** starts you at the right phase instead of
-redoing finished work.
+redoing finished work. And when Phase 5 surfaces a finding bigger than a local fix, it **loops back**
+to the phase that owns it (re-plan or re-design that slice) instead of patching forward.
 
-### What makes the output different
+## ⚡ Quick start
+
+**Requirements:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) ·
+[gstack](https://github.com/garrytan/gstack) (used in Phases 5–6) · `frontend-design` (bundled; only
+for UI work). gstack needs [Bun](https://bun.sh/) and a Playwright browser — the bootstrapper below
+installs both for you.
+
+### 📦 Option A — plugin (recommended)
+
+```
+/plugin marketplace add RudreshNarwal/shipwright
+/plugin install shipwright
+```
+
+That's it for the bundled skills. gstack is the one dependency that can't be bundled — on the next
+session, Shipwright **auto-detects** whether it's installed and prints a one-line install command if
+it's missing. To install it (one command — also brings Bun + Playwright):
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/RudreshNarwal/shipwright/main/scripts/install-gstack.sh)
+# …or, from a clone:  bash scripts/install-gstack.sh
+```
+
+**Auto-install (opt-in):** set `SHIPWRIGHT_AUTO_INSTALL_GSTACK=1` and Shipwright installs gstack for
+you in the background on session start (idempotent; re-run the command above if it's interrupted).
+It's opt-in by design — it downloads ~1 GB plus a browser, so we don't do it silently without your
+say-so.
+
+### 📂 Option B — copy the skills
+
+```bash
+git clone https://github.com/RudreshNarwal/shipwright.git
+cp -R shipwright/skills/* ~/.claude/skills/
+bash shipwright/scripts/install-gstack.sh        # installs Bun + gstack + Playwright
+```
+
+The bootstrapper (`scripts/install-gstack.sh`) is idempotent and installs, in order: **Bun** (if
+missing), the **gstack** clone + its `./setup`, and **Playwright's Chromium**. Add `--yes` to run it
+non-interactively. Phase 0 also checks for gstack before any QA/ship work and stops with instructions
+if it's still missing.
+
+### 🚀 Run it
+
+```
+/shipwright
+```
+
+…or just hand Claude a requirement and say "run this end-to-end with shipwright." After the spec is
+approved you'll be asked once whether to continue autonomously and for any QA login credentials
+(leave blank and it self-registers a throwaway test account against non-prod targets).
+
+Curious what the output looks like? See [`docs/example-report/`](./docs/example-report/) for a
+template of the evidence-rich report Phase 6 commits — screenshots per feature, the assumptions the
+run made, and the per-stage cost table.
+
+## ⚡ What makes the output different
 
 - **API-level QA, not just screenshots.** Phase 5 runs `browse network` after every key flow — a
   pretty UI that silently 4xx/5xx's is a bug, and Shipwright catches it.
@@ -84,7 +161,7 @@ redoing finished work.
 - **Discipline that survives subagents.** Fresh subagents inherit no context, so the "don't assume"
   rules are injected into each implementer prompt — unstated assumptions are treated as a failed review.
 
-## Before / after
+## 🔁 Before / after
 
 Same agent, same requirement — the difference is what shows up in the pull request.
 
@@ -105,7 +182,7 @@ Same agent, same requirement — the difference is what shows up in the pull req
   re-design that slice — the diff fixes the root, not the symptom.
 - A soft gate that refuses to ship over failed tests or low QA health without your say-so.
 
-## Numbers
+## 📊 The numbers
 
 Shipwright doesn't ship fabricated benchmarks. The numbers here come from a real benchmark harness
 ([`benchmarks/`](./benchmarks/)) that runs a control-vs-treatment experiment — the same model and
@@ -127,68 +204,14 @@ Full method, task suite, and raw runs live in
 [`benchmarks/METHODOLOGY.md`](./benchmarks/METHODOLOGY.md). Until the gate is cleared, assume there
 are no numbers worth quoting — and don't quote any.
 
-## Install
-
-**Requirements:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code) ·
-[gstack](https://github.com/garrytan/gstack) (used in Phases 5–6) · `frontend-design` (bundled; only
-for UI work). gstack needs [Bun](https://bun.sh/) and a Playwright browser — the bootstrapper below
-installs both for you.
-
-### Option A — plugin (recommended)
-
-```
-/plugin marketplace add RudreshNarwal/shipwright
-/plugin install shipwright
-```
-
-That's it for the bundled skills. gstack is the one dependency that can't be bundled — on the next
-session, Shipwright **auto-detects** whether it's installed and prints a one-line install command if
-it's missing. To install it (one command — also brings Bun + Playwright):
-
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/RudreshNarwal/shipwright/main/scripts/install-gstack.sh)
-# …or, from a clone:  bash scripts/install-gstack.sh
-```
-
-**Auto-install (opt-in):** set `SHIPWRIGHT_AUTO_INSTALL_GSTACK=1` and Shipwright installs gstack for
-you in the background on session start (idempotent; re-run the command above if it's interrupted).
-It's opt-in by design — it downloads ~1 GB plus a browser, so we don't do it silently without your
-say-so.
-
-### Option B — copy the skills
-
-```bash
-git clone https://github.com/RudreshNarwal/shipwright.git
-cp -R shipwright/skills/* ~/.claude/skills/
-bash shipwright/scripts/install-gstack.sh        # installs Bun + gstack + Playwright
-```
-
-### What the bootstrapper does
-
-`scripts/install-gstack.sh` is idempotent and installs, in order: **Bun** (if missing), the **gstack**
-clone + its `./setup`, and **Playwright's Chromium**. Add `--yes` to run it non-interactively. Phase 0
-also checks for gstack before any QA/ship work and stops with instructions if it's still missing.
-
-## Usage
-
-```
-/shipwright
-```
-
-…or just hand Claude a requirement and say "run this end-to-end with shipwright." After the spec is
-approved you'll be asked once whether to continue autonomously and for any QA login credentials
-(leave blank and it self-registers a throwaway test account against non-prod targets).
-
-See [`docs/example-report/`](./docs/example-report/) for a template of the report Phase 6 produces.
-
-## What's bundled
+## 📦 What's bundled
 
 Shipwright vendors a pinned, permissively-licensed snapshot of the skills it orchestrates (all MIT,
 plus one Apache-2.0 skill — `frontend-design`), so it installs as one self-contained plugin. gstack is
 the exception — it's a separate product you install once. Full provenance and versions are in
 [`VENDORED.md`](./VENDORED.md).
 
-## FAQ
+## ❓ FAQ
 
 **How is this different from just running a coding agent?**
 A normal agent gives you a diff and a summary. Shipwright drives a fixed six-phase pipeline
@@ -237,7 +260,7 @@ won't populate). Bottom line: **Claude Code is the supported target; opencode is
 the non-gstack phases, but it's unverified.** Cursor, Codex, Copilot, and Kiro are further off — they
 lack an equivalent skill + subagent model.
 
-## Credits
+## 🙏 Credits
 
 Shipwright stands on the shoulders of several excellent open-source projects:
 
@@ -253,7 +276,7 @@ Shipwright stands on the shoulders of several excellent open-source projects:
   *inspiration, not bundled.* Its explicit "does this need to exist / stdlib / platform / existing
   dep / one line" build ladder shaped the checklist Shipwright injects into each Build-phase prompt.
 
-## License & attribution
+## 📄 License & attribution
 
 Shipwright itself is **MIT © 2026 Rudresh Narwal**.
 
