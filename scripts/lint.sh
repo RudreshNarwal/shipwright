@@ -29,7 +29,7 @@ else
 fi
 
 echo "==> 4. JSON manifests are valid"
-if python3 -c "import json,glob; [json.load(open(f)) for f in glob.glob('$ROOT/.claude-plugin/*.json')]" 2>/tmp/sw_json; then
+if python3 -c "import json,glob; [json.load(open(f)) for f in glob.glob('$ROOT/.claude-plugin/*.json') + glob.glob('$ROOT/.codex-plugin/*.json') + ['$ROOT/opencode.json']]" 2>/tmp/sw_json; then
   echo "OK"
 else
   echo "FAIL:"; cat /tmp/sw_json; fail=1
@@ -40,6 +40,17 @@ if grep -rin "rudy" "$ROOT/skills/shipwright" >/tmp/sw_rudy 2>/dev/null; then
   echo "FAIL: personal references remain:"; cat /tmp/sw_rudy; fail=1
 else
   echo "OK"
+fi
+
+echo "==> 6. OpenCode plugin parses (skipped if node absent)"
+if command -v node >/dev/null 2>&1; then
+  if node --check "$ROOT/.opencode/plugins/shipwright.mjs" 2>/tmp/sw_mjs; then
+    echo "OK"
+  else
+    echo "FAIL:"; cat /tmp/sw_mjs; fail=1
+  fi
+else
+  echo "SKIP (node not found)"
 fi
 
 if [ "$fail" -ne 0 ]; then echo; echo "LINT FAILED"; exit 1; fi
