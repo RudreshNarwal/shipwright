@@ -1,0 +1,40 @@
+{
+  "name": "shipwright",
+  "description": "End-to-end development pipeline: brainstorm -> plan -> build (TDD, subagents) -> review -> browser QA (UI + API) -> evidence-rich finalize -> ship. Hand it a requirement, get back a PR with proof.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Rudresh Narwal",
+    "url": "https://github.com/RudreshNarwal"
+  },
+  "homepage": "https://github.com/RudreshNarwal/shipwright",
+  "repository": "https://github.com/RudreshNarwal/shipwright",
+  "license": "MIT",
+  "keywords": [
+    "workflow",
+    "pipeline",
+    "tdd",
+    "qa",
+    "code-review",
+    "autonomous",
+    "end-to-end",
+    "ship"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Shipwright",
+    "shortDescription": "Drive a requirement end-to-end to a reviewed, QA'd, shipped PR.",
+    "longDescription": "An orchestrator that drives a feature or bugfix through six phases — brainstorm, plan, build (TDD + subagents), review, browser QA, and ship — with Karpathy discipline throughout. Phases 1-4 run on Codex; browser QA and ship depend on gstack, which is Claude-Code-only (run the front half here and ship by hand).",
+    "developerName": "Rudresh Narwal",
+    "category": "Developer Tools",
+    "capabilities": ["Instructions", "Lifecycle hooks"],
+    "websiteURL": "https://github.com/RudreshNarwal/shipwright",
+    "defaultPrompt": [
+      "Run Shipwright on this requirement.",
+      "Ship this feature end-to-end with Shipwright.",
+      "Use Shipwright to plan and build this."
+    ],
+    "brandColor": "#111111",
+    "composerIcon": "./assets/icon.svg",
+    "logo": "./assets/icon.svg"
+  }
+}

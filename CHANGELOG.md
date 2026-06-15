@@ -7,6 +7,13 @@ All notable changes to Shipwright are documented here. The format is based on
 ## [Unreleased]
 
 ### Added
+- **Multi-harness install adapters (Codex + OpenCode).** Shipwright now ships a `.codex-plugin/plugin.json`
+  (Codex reuses the same `skills/`) and an `opencode.json` + `.opencode/plugins/shipwright.mjs` (a thin
+  plugin that runs the gstack preflight on session start). The README gains a Codex/OpenCode install
+  section and a **capability matrix**: Phases 1–4 run on both, while gstack browser-QA/ship and
+  `cost-table.py` stay Claude-Code-only. Lightweight adapters only — the end-to-end run on Codex/OpenCode
+  is unverified, as the matrix states. `scripts/lint.sh` now validates the two new manifests and
+  `node --check`s the plugin.
 - **One-command gstack bootstrapper + auto-detect.** `scripts/install-gstack.sh` now installs the whole
   chain — **Bun** (if missing), the **gstack** clone + `./setup`, and **Playwright's Chromium** — and
   takes `--yes` for unattended runs. A new `SessionStart` hook (`hooks/hooks.json` →

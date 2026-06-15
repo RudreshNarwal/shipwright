@@ -43,6 +43,11 @@ When porting changes from `rudys-workflow` → here: rename to `shipwright`, str
 .claude-plugin/
   plugin.json          # the plugin definition (name, version, MIT, author)
   marketplace.json     # makes `/plugin marketplace add RudreshNarwal/shipwright` work
+.codex-plugin/
+  plugin.json          # Codex adapter — reuses skills/ (`codex plugin marketplace add ...`); trust the SessionStart hook via /hooks
+opencode.json          # OpenCode adapter — points at the .opencode plugin below
+.opencode/
+  plugins/shipwright.mjs # thin OpenCode plugin: runs the gstack preflight on session start
 skills/
   shipwright/          # THE MAIN WORKFLOW — this is the project's own code
     SKILL.md           # the 6-phase pipeline + Phase-0 preflight + autonomy gate

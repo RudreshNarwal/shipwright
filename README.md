@@ -136,6 +136,46 @@ missing), the **gstack** clone + its `./setup`, and **Playwright's Chromium**. A
 non-interactively. Phase 0 also checks for gstack before any QA/ship work and stops with instructions
 if it's still missing.
 
+### 🤖 Other harnesses — Codex & OpenCode
+
+Shipwright is built and verified on Claude Code, but the front half of the pipeline runs anywhere with
+a real skill + subagent model. Two adapters ship in the repo so it installs cleanly:
+
+**Codex** — `.codex-plugin/plugin.json` reuses the same `skills/`:
+
+```
+codex plugin marketplace add RudreshNarwal/shipwright
+```
+
+Then in Codex open `/plugins`, select the Shipwright marketplace, and install Shipwright. Open
+`/hooks`, review and trust its SessionStart hook (the gstack preflight check), and start a new thread.
+
+**OpenCode** — run from a checkout of this repo (the plugin reuses its `skills/` and `scripts/`), and
+add to `opencode.json`:
+
+```json
+{ "plugin": ["./.opencode/plugins/shipwright.mjs"] }
+```
+
+The plugin runs the gstack preflight on session start; OpenCode is expected to discover the bundled
+`skills/` from the checkout (unverified — see the capability matrix).
+
+> Install gstack the same way on both (`scripts/install-gstack.sh`) **if** you want Phases 5–6 there —
+> but see the capability matrix: gstack is Claude-Code-only, so QA/ship don't yet run on Codex or
+> OpenCode.
+
+### 📊 Capability matrix
+
+| Phase | Claude Code | Codex | OpenCode |
+|---|:---:|:---:|:---:|
+| 1 Brainstorm · 2 Plan · 3 Build · 4 Review | ✅ | ✅ | ✅ |
+| 5 Browser QA · 6 Ship (gstack) | ✅ | ⚠️¹ | ⚠️¹ |
+| Per-stage cost table (`cost-table.py`) | ✅ | ❌² | ❌² |
+
+¹ gstack (browser + API QA, design review, ship) is a Claude-Code-only product — on Codex/OpenCode,
+run Phases 1–4 and ship by hand. ² `cost-table.py` reads Claude Code session transcripts
+(`~/.claude/projects/.../*.jsonl`); it produces no output on other harnesses.
+
 ### 🚀 Run it
 
 ```
@@ -250,15 +290,17 @@ real.
 Never. QA credentials live in a gitignored file; only the finalize report and screenshots get
 committed, with secrets redacted.
 
-**Does it work on opencode or other agent tools?**
-Shipwright is built and verified on Claude Code. opencode also has `SKILL.md` skills and subagents,
-and superpowers has already been ported there — so **Phases 1–4 (brainstorm, plan, build, review)
-are likely workable on opencode**, since they ride those skills. Two things don't port today:
-gstack (Phases 5–6: the browser + API QA, design review, and ship tooling is a separate product not
-available there), and `cost-table.py` (it reads Claude Code session transcripts, so the cost table
-won't populate). Bottom line: **Claude Code is the supported target; opencode is likely workable for
-the non-gstack phases, but it's unverified.** Cursor, Codex, Copilot, and Kiro are further off — they
-lack an equivalent skill + subagent model.
+**Does it work on Codex, OpenCode, or other agent tools?**
+Shipwright is built and verified on Claude Code, but **Codex and OpenCode both have a real skill +
+subagent model**, so the front half of the pipeline rides those skills. Adapters for both ship in the
+repo — see [Other harnesses](#-other-harnesses--codex--opencode) and the
+[capability matrix](#-capability-matrix) for install steps and exactly what runs where. In short:
+**Phases 1–4 (brainstorm, plan, build, review) work on Codex and OpenCode**; two things stay
+Claude-Code-only — gstack (Phases 5–6: browser + API QA, design review, ship, a separate product),
+and `cost-table.py` (it reads Claude Code session transcripts, so the cost table won't populate).
+Claude Code remains the fully-supported target; the Codex/OpenCode adapters are provided but
+unverified end-to-end. Cursor, Copilot, and Kiro are further off — they lack an
+equivalent skill + subagent model.
 
 ## 🙏 Credits
 
