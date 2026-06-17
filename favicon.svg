@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Shipwright">
+  <!-- Shipwright mark — a ship's hull framed on the keel that resolves into a checkmark:
+       build (the frame) -> ship (the hull) -> proof (the check).
+       Palette: slate #0F172A | maritime teal #0EA5A0 | proof green #22C55E.
+       Monochrome-safe: the bold stroke alone reads as a check at favicon size. -->
+  <defs>
+    <linearGradient id="sw-hull" x1="8" y1="56" x2="56" y2="8" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0EA5A0"/>
+      <stop offset="1" stop-color="#22C55E"/>
+    </linearGradient>
+  </defs>
+  <!-- waterline -->
+  <g stroke="#0EA5A0" stroke-linecap="round" opacity="0.45">
+    <line x1="7"  y1="53" x2="22" y2="53" stroke-width="3"/>
+    <line x1="28" y1="53" x2="41" y2="53" stroke-width="3"/>
+  </g>
+  <!-- hull ribs — the shipwright's frame timbers standing on the keel -->
+  <g stroke="#0F172A" stroke-width="2.4" stroke-linecap="round" opacity="0.92">
+    <line x1="20" y1="24" x2="20" y2="39"/>
+    <line x1="28" y1="20" x2="28" y2="45"/>
+    <line x1="36" y1="24" x2="36" y2="39"/>
+  </g>
+  <!-- hull + checkmark: dips to a rounded keel, then rises into the proof check -->
+  <path d="M11 28 C 13 41, 21 47, 30 45 C 37 43, 41 37, 44 30 L 57 9"
+        fill="none" stroke="url(#sw-hull)" stroke-width="8"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
