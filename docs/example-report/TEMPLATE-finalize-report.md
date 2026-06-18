@@ -1,7 +1,8 @@
 # Finalize report — TEMPLATE
 
 > 📋 **This is a template, not a captured run.** It shows the *shape* of the report Shipwright's
-> Phase 6 writes to `docs/finalize/YYYY-MM-DD-<branch>.md`. Every value is a `<placeholder>` —
+> Phase 6 writes to `docs/finalize/YYYY-MM-DD-<branch-slug>.md` (`<branch-slug>` = branch name with
+> `/` replaced by `-`). Every value is a `<placeholder>` —
 > nothing here is invented or measured. A real run fills these in from actual tests, gstack `/qa`,
 > one screenshot **per feature**, and `cost-table.py`.
 
@@ -27,7 +28,7 @@
 - **Solution:** `<what was built, briefly>`
 - **Screenshot:**
 
-  ![<feature 1 working>](assets/<branch>/<feature-1-slug>.png)
+  ![<feature 1 working>](assets/<branch-slug>/<feature-1-slug>.png)
 
 - **File changes:** `<path/a.ts>`, `<path/b.vue>` (+`<a>` / −`<b>`)
 
@@ -37,7 +38,7 @@
 - **Solution:** `<what was built, briefly>`
 - **Screenshot:**
 
-  ![<feature 2 working>](assets/<branch>/<feature-2-slug>.png)
+  ![<feature 2 working>](assets/<branch-slug>/<feature-2-slug>.png)
 
 - **File changes:** `<path/c.py>` (+`<a>` / −`<b>`)
 
