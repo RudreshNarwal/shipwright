@@ -190,15 +190,20 @@ Goal: durable proof the branch was checked thoroughly, then ship.
 2. **Evidence — one screenshot per feature** — invoke gstack `/qa-only` (report-only; Phase 5 already
    fixed bugs) and `/browse` to capture **at least one screenshot per feature**, each demonstrating
    that feature working — 2 features → 2 shots, 5 features → 5 shots — saved to
-   `docs/finalize/assets/<branch>/<feature-slug>.png`, plus one `browse network` capture of the core
+   `docs/finalize/assets/<branch-slug>/<feature-slug>.png`, plus one `browse network` capture of the core
    flow (proof the API layer was checked). A feature with several flows may have more than one shot;
-   never fewer than one per feature.
+   never fewer than one per feature. **`<branch-slug>` is the branch name with `/` replaced by `-`**
+   (e.g. `feat/login` → `feat-login`) — a raw `/` would nest the report into a subdir and break the
+   relative image links. Use the same `<branch-slug>` in the report filename and image links below.
    - Non-web repo / no app URL → skip browser steps, run the detected unit-test runner, and capture the
      feature's CLI/test output instead; note "no UI to screenshot" where genuinely nothing is visual.
-3. **Report** — write `docs/finalize/YYYY-MM-DD-<branch>.md` with: the **query** (the original
+3. **Report** — write `docs/finalize/YYYY-MM-DD-<branch-slug>.md` (same `<branch-slug>` as above —
+   the report and its `assets/<branch-slug>/` dir must stay siblings under `docs/finalize/`, else the
+   relative image links break) with: the **query** (the original
    requirement, verbatim); a one-paragraph overall solution summary; then **one block per feature** —
    *Query* (what was asked for this slice) · *Solution* (what was built) · *Screenshot* (the embedded
-   proof image for that feature, relative link) · *File changes* (the files touched for it). Follow
+   proof image for that feature, as a relative link `assets/<branch-slug>/<feature-slug>.png` — NOT an
+   absolute path) · *File changes* (the files touched for it). Follow
    with: test + QA results (health score, pass/fail, issues, any Phase-5 escalations); assumptions made
    during the run; any no-harness exception; a "checked thoroughly" statement backed by the evidence;
    and the per-stage cost table (below). Lead numeric claims with token counts (exact); dollars are
