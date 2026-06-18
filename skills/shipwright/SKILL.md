@@ -76,7 +76,8 @@ When the spec is approved, ask one batched question with two parts:
    Credentials).
 
 - **No** → interactive mode: each sub-skill's natural checkpoints apply, as usual.
-- **Yes** → autonomous mode: zero further questions to the user until the run ends. At every
+- **Yes** → autonomous mode: zero further questions to the user until the run ends — the one
+  end-of-run exception is the final merge-to-main confirmation (P6 close-out). At every
   decision point, take the recommended default:
 
 | Decision point | Autonomous default |
@@ -90,7 +91,7 @@ When the spec is approved, ask one batched question with two parts:
 | QA product/scope flaw (P5) | **STOP and surface** — never silently re-scope (see Phase 5 triage) |
 | Missing QA credentials | env / creds file / gate answer; else self-register a test account (non-prod only); signup impossible → STOP and report |
 | Soft gate fails (P6) | STOP and report — never ship failures autonomously |
-| Close-out (P6) | `/ship` → PR (never merge the main branch directly) |
+| Close-out (P6) | `/ship` → PR, then **STOP for the user's explicit yes/no before merging into the base branch this work was branched from** (`dev`/`develop`/`main`/`master` — name it) — the single question autonomous mode still asks, at run end. Yes → `/land-and-deploy`; No → leave the PR open |
 
 Autonomous mode removes *questions to the user*, not harness permissions — pair it with a scoped
 `.claude/settings.json` allowlist (see Running automatically) or tool prompts will still interrupt.
@@ -177,7 +178,7 @@ Triage **every** QA finding into one class and take its route:
 `shipwright:executing-plans`, `shipwright:systematic-debugging`,
 `shipwright:verification-before-completion`, `shipwright:finishing-a-development-branch`,
 `shipwright:karpathy-guidelines`, `shipwright:frontend-design`, and gstack `/qa`, `/qa-only`,
-`/browse`, `/design-review`, `/autoplan`, `/ship`, `/setup-browser-cookies`.
+`/browse`, `/design-review`, `/autoplan`, `/ship`, `/land-and-deploy`, `/setup-browser-cookies`.
 
 ## Phase 6 — Enhanced Finalize
 
@@ -204,10 +205,21 @@ Goal: durable proof the branch was checked thoroughly, then ship.
    estimates.
 4. **Soft gate** — tests failed, QA health low, or a no-harness exception exists → surface it
    prominently and require the user's explicit confirmation before shipping. Override allowed. Clean → proceed.
-5. **Commit** the report + screenshots to the branch (NEVER credentials), then **ship**: invoke
-   gstack `/ship` (merge base, tests, version/changelog when present, push, PR). If the user instead
-   wants a local merge or to discard the branch, invoke `shipwright:finishing-a-development-branch`.
-   Never run both — they both want to own the PR step.
+5. **Commit & open the PR** — commit the report + screenshots to the branch (NEVER credentials),
+   then invoke gstack `/ship` (merge base, tests, version/changelog when present, push, PR). This
+   creates the PR; it does **not** merge to main.
+6. **Final merge gate (always, both modes)** — once all is done, present the finalize report + PR
+   link and ask the user an explicit **yes/no to merge into the base branch this work was branched
+   from**. Resolve that base branch first (the PR's base / `/ship`'s detected base — e.g. `dev`,
+   `develop`, `main`, `master`) and name it in the question: **"Merge to `<base>` now?"**. If the
+   repo's only long-lived branch is `main` (or `master`), that is the base — offer it. Never merge
+   into a branch other than the one the feature was created from.
+   - **Yes** → merge via gstack `/land-and-deploy` (merge PR into `<base>`, wait for CI/deploy, verify
+     production health). For a local merge or no remote, use `shipwright:finishing-a-development-branch`.
+   - **No** → stop; leave the PR open and report it as awaiting manual merge.
+   `/ship` owns the PR step and `/land-and-deploy` owns the merge step — never hand the same step to
+   both, and don't also run `finishing-a-development-branch` when `/land-and-deploy` is doing the merge.
+   In autonomous mode this gate is the single end-of-run question; never merge without it.
 
 ## Credentials (resolve at the Autonomy gate)
 
@@ -260,11 +272,14 @@ No per-phase cost API exists, so attribute it from session transcripts:
 - Re-running the WHOLE pipeline on a loop-back instead of just the affected slice — escalation is surgical.
 - Forgetting a stage marker → the cost table loses that phase.
 - Running `/qa` (fix loop) in Finalize instead of `/qa-only` → Finalize must not mutate code.
-- Running both `/ship` and `finishing-a-development-branch` → pick one.
+- Running both `/ship` and `finishing-a-development-branch`, or handing the merge to both
+  `/land-and-deploy` and `finishing-a-development-branch` → `/ship` opens the PR, one merger closes it.
 - Committing credentials → never; only the report + screenshots get committed.
 - Skipping the soft-gate confirmation when QA failed or tests were absent → always surface before shipping.
 - Asking the user questions mid-run in autonomous mode — the only valid stops are missing
-  credentials and a failed soft gate.
+  credentials, a failed soft gate, and the final merge confirmation at run end.
+- Merging without the final yes/no gate, or merging into a branch other than the one the work was
+  branched from → always ask first, and name the actual base branch in the question.
 - Dispatching implementer subagents without the karpathy rules — or the build ladder
   (stdlib / platform / existing-dep / one-line checks before writing) — in their prompt; subagents
   assume silently and over-build unless told otherwise.
