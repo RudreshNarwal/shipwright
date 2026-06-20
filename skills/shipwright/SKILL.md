@@ -71,14 +71,17 @@ rules are in context — the summary below is a reminder, not a substitute.
 When the spec is approved, ask one batched question with two parts:
 
 1. **"Run the rest autonomously?"**
-2. **"QA login credentials?"** — email + password + display name for the app under test, if QA
-   will hit authenticated pages. Leave blank → a test account will be self-registered (see
-   Credentials).
+2. **"QA login credentials?"** — three ways to authenticate the app under test, if QA will hit
+   authenticated pages: (a) email + password + display name, (b) **import cookies from your real
+   browser** → runs gstack `/setup-browser-cookies`, or (c) leave blank → a test account is
+   self-registered (see Credentials).
 
 - **No** → interactive mode: each sub-skill's natural checkpoints apply, as usual.
-- **Yes** → autonomous mode: zero further questions to the user until the run ends — the one
-  end-of-run exception is the final merge-to-main confirmation (P6 close-out). At every
-  decision point, take the recommended default:
+- **Yes** → autonomous mode: zero questions to the user from here to the end of the run — including
+  the close-out, which ships **and** merges without confirmation. The only stops are the hard ones
+  below (missing credentials that can't be resolved, a failed soft gate, a product/scope flaw) —
+  i.e. only when input is genuinely required or something is off. At every decision point, take the
+  recommended default:
 
 | Decision point | Autonomous default |
 |---|---|
@@ -91,7 +94,7 @@ When the spec is approved, ask one batched question with two parts:
 | QA product/scope flaw (P5) | **STOP and surface** — never silently re-scope (see Phase 5 triage) |
 | Missing QA credentials | env / creds file / gate answer; else self-register a test account (non-prod only); signup impossible → STOP and report |
 | Soft gate fails (P6) | STOP and report — never ship failures autonomously |
-| Close-out (P6) | `/ship` → PR, then **STOP for the user's explicit yes/no before merging into the base branch this work was branched from** (`dev`/`develop`/`main`/`master` — name it) — the single question autonomous mode still asks, at run end. Yes → `/land-and-deploy`; No → leave the PR open |
+| Close-out (P6) | `/ship` → PR, then `/land-and-deploy` — merge into the base branch this work was branched from (`dev`/`develop`/`main`/`master` — name it) and verify the deploy, **without confirmation**. Stop only if `/ship`, CI, or the deploy fails (something is off). |
 
 Autonomous mode removes *questions to the user*, not harness permissions — pair it with a scoped
 `.claude/settings.json` allowlist (see Running automatically) or tool prompts will still interrupt.
@@ -213,18 +216,19 @@ Goal: durable proof the branch was checked thoroughly, then ship.
 5. **Commit & open the PR** — commit the report + screenshots to the branch (NEVER credentials),
    then invoke gstack `/ship` (merge base, tests, version/changelog when present, push, PR). This
    creates the PR; it does **not** merge to main.
-6. **Final merge gate (always, both modes)** — once all is done, present the finalize report + PR
-   link and ask the user an explicit **yes/no to merge into the base branch this work was branched
-   from**. Resolve that base branch first (the PR's base / `/ship`'s detected base — e.g. `dev`,
-   `develop`, `main`, `master`) and name it in the question: **"Merge to `<base>` now?"**. If the
-   repo's only long-lived branch is `main` (or `master`), that is the base — offer it. Never merge
-   into a branch other than the one the feature was created from.
-   - **Yes** → merge via gstack `/land-and-deploy` (merge PR into `<base>`, wait for CI/deploy, verify
-     production health). For a local merge or no remote, use `shipwright:finishing-a-development-branch`.
-   - **No** → stop; leave the PR open and report it as awaiting manual merge.
+6. **Merge into the base branch** this work was branched from. Resolve that base first (the PR's base
+   / `/ship`'s detected base — e.g. `dev`, `develop`, `main`, `master`); if the repo's only long-lived
+   branch is `main` (or `master`), that is the base. Never merge into a branch other than the one the
+   feature was created from. Then merge via gstack `/land-and-deploy` (merge PR into `<base>`, wait for
+   CI/deploy, verify production health); for a local merge or no remote, use
+   `shipwright:finishing-a-development-branch`.
+   - **Interactive mode:** present the finalize report + PR link and ask an explicit **"Merge to
+     `<base>` now?"**. Yes → merge; No → stop, leave the PR open, report it as awaiting manual merge.
+   - **Autonomous mode:** merge automatically — no confirmation. Stop only if a hard gate already
+     tripped (failed soft gate, unresolved credentials, product/scope flaw) or `/ship`, CI, or the
+     deploy fails.
    `/ship` owns the PR step and `/land-and-deploy` owns the merge step — never hand the same step to
    both, and don't also run `finishing-a-development-branch` when `/land-and-deploy` is doing the merge.
-   In autonomous mode this gate is the single end-of-run question; never merge without it.
 
 ## Credentials (resolve at the Autonomy gate)
 
@@ -233,7 +237,10 @@ Needed when QA must test authenticated pages. Resolution order:
 1. Env vars or the gitignored `.claude/finalize-creds.json` → use silently.
 2. What the user provided at the Autonomy gate (email + password + display name). Offer to save
    it to `.claude/finalize-creds.json` for next time.
-3. Nothing provided → **self-register a test account**: sign up through the app's register flow
+3. User chose **import cookies** at the gate → run gstack `/setup-browser-cookies` to import the
+   logged-in session from their real browser, then run QA against that session. (Interactive only —
+   the picker needs the user; not available in autonomous mode.)
+4. Nothing provided → **self-register a test account**: sign up through the app's register flow
    (or its auth API) with a generated display name, email, and strong password; save the creds to
    `.claude/finalize-creds.json`; then log in and run QA with it.
    - Self-register ONLY against local/dev/staging targets — NEVER against production.
@@ -282,7 +289,8 @@ No per-phase cost API exists, so attribute it from session transcripts:
 - Committing credentials → never; only the report + screenshots get committed.
 - Skipping the soft-gate confirmation when QA failed or tests were absent → always surface before shipping.
 - Asking the user questions mid-run in autonomous mode — the only valid stops are missing
-  credentials, a failed soft gate, and the final merge confirmation at run end.
+  credentials that can't be resolved, a failed soft gate, and a product/scope flaw. Autonomous
+  mode ships and merges at close-out without asking.
 - Merging without the final yes/no gate, or merging into a branch other than the one the work was
   branched from → always ask first, and name the actual base branch in the question.
 - Dispatching implementer subagents without the karpathy rules — or the build ladder
