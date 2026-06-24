@@ -1,14 +1,14 @@
-# Shipwright Implementation Plan
+# Provenship Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: superpowers:subagent-driven-development or
 > superpowers:executing-plans. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Open-source Rudy's private `/rudys-workflow` as **Shipwright** — a self-contained,
-installable Claude Code plugin (`github.com/RudreshNarwal/shipwright`, MIT).
+**Goal:** Open-source Rudy's private `/rudys-workflow` as **Provenship** — a self-contained,
+installable Claude Code plugin (`github.com/RudreshNarwal/provenship`, MIT).
 
-**Architecture:** A plugin repo with `skills/shipwright/` (the ported workflow) plus 12 vendored
+**Architecture:** A plugin repo with `skills/provenship/` (the ported workflow) plus 12 vendored
 MIT skills (11 from superpowers + karpathy-guidelines) with their namespaces rewritten to
-`shipwright:`. gstack cannot be vendored (1 GB Bun/TS product) → declared dependency, gated by a
+`provenship:`. gstack cannot be vendored (1 GB Bun/TS product) → declared dependency, gated by a
 Phase-0 preflight + bundled installer. Full launch kit: README, CI namespace-linter, sync script,
 CONTRIBUTING, example report.
 
@@ -23,7 +23,7 @@ using-git-worktrees (transitively referenced), + karpathy-guidelines. Only un-ve
 `frontend-design` (preflight-gated).
 
 **Constraint:** NO changes to the operator repo or to `~/.claude/skills/rudys-workflow/`. All work
-in `/Users/rudy/dev/shipwright/`.
+in `/Users/rudy/dev/provenship/`.
 
 ---
 
@@ -33,26 +33,26 @@ in `/Users/rudy/dev/shipwright/`.
 
 - [ ] Copy 11 superpowers skill dirs (incl. using-git-worktrees) from the 5.1.0 plugin cache and
       karpathy-guidelines from the 1.0.0 cache into `skills/`.
-- [ ] Rewrite refs in every vendored file: `superpowers:` → `shipwright:`,
-      `andrej-karpathy-skills:karpathy-guidelines` → `shipwright:karpathy-guidelines`.
+- [ ] Rewrite refs in every vendored file: `superpowers:` → `provenship:`,
+      `andrej-karpathy-skills:karpathy-guidelines` → `provenship:karpathy-guidelines`.
       Leave `elements-of-style:` refs untouched (optional, not vendored).
 - [ ] **Verify:** `grep -rE "superpowers:|andrej-karpathy-skills:" skills/` returns nothing; every
-      `shipwright:<x>` ref resolves to a vendored dir.
+      `provenship:<x>` ref resolves to a vendored dir.
 
-### Task 2: Port the main shipwright skill
+### Task 2: Port the main provenship skill
 
-**Files:** Create `skills/shipwright/SKILL.md`, `skills/shipwright/cost-table.py`.
+**Files:** Create `skills/provenship/SKILL.md`, `skills/provenship/cost-table.py`.
 
-- [ ] Copy rudys-workflow SKILL.md → frontmatter `name: shipwright`; triggers-only description
-      (`/shipwright`, "run shipwright", end-to-end requirement). No workflow summary in description.
-- [ ] `superpowers:` / `andrej-karpathy-skills:` refs → `shipwright:`.
+- [ ] Copy rudys-workflow SKILL.md → frontmatter `name: provenship`; triggers-only description
+      (`/provenship`, "run provenship", end-to-end requirement). No workflow summary in description.
+- [ ] `superpowers:` / `andrej-karpathy-skills:` refs → `provenship:`.
 - [ ] Add **Phase 0 — Preflight**: verify gstack installed (`~/.claude/skills/gstack/` or `/qa`
       resolvable) and `frontend-design` available; if missing, print install (scripts/install-gstack.sh)
       and STOP.
 - [ ] Replace `python3 ~/.claude/skills/rudys-workflow/cost-table.py` with a path-agnostic
       instruction (run cost-table.py from this skill's own directory).
 - [ ] Copy cost-table.py verbatim (already path-independent — uses `Path.cwd()` for project dir).
-- [ ] **Verify:** `grep -ri "rudy" skills/shipwright/` returns nothing; `python3 -m py_compile`
+- [ ] **Verify:** `grep -ri "rudy" skills/provenship/` returns nothing; `python3 -m py_compile`
       on cost-table.py passes.
 
 ### Task 3: Plugin manifests, license, provenance
@@ -60,7 +60,7 @@ in `/Users/rudy/dev/shipwright/`.
 **Files:** `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `LICENSE`,
 `licenses/superpowers.LICENSE`, `licenses/karpathy-skills.LICENSE`, `VENDORED.md`.
 
-- [ ] plugin.json: name shipwright, version 0.1.0, MIT, author RudreshNarwal, homepage/repo URLs.
+- [ ] plugin.json: name provenship, version 0.1.0, MIT, author RudreshNarwal, homepage/repo URLs.
 - [ ] marketplace.json: owner RudreshNarwal, one plugin entry `source: "./"`.
 - [ ] LICENSE: MIT, Copyright (c) 2026 Rudresh Narwal.
 - [ ] licenses/: preserve upstream MIT notices (Jesse Vincent / forrestchang).
@@ -86,11 +86,11 @@ in `/Users/rudy/dev/shipwright/`.
       Requirements (Claude Code, gstack+Bun, frontend-design optional), autonomy-gate pitch,
       attribution (superpowers/gstack/karpathy with links + licenses).
 - [ ] lint.yml: fail if `skills/` contains `superpowers:`/`andrej-karpathy-skills:`; assert every
-      `shipwright:<x>` ref resolves; `py_compile` cost-table.py; validate JSON manifests.
+      `provenship:<x>` ref resolves; `py_compile` cost-table.py; validate JSON manifests.
 - [ ] CONTRIBUTING + issue templates.
 - [ ] example-report: clearly-labeled illustrative finalize report (NOT a fabricated real run);
       README note that a real captured run should replace it before the public launch tweet.
-- [ ] **Verify:** flow diagram phase count matches SKILL.md; install commands use RudreshNarwal/shipwright.
+- [ ] **Verify:** flow diagram phase count matches SKILL.md; install commands use RudreshNarwal/provenship.
 
 ### Task 6: Verify + commit
 

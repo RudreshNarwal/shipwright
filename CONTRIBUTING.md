@@ -1,14 +1,14 @@
-# Contributing to Shipwright
+# Contributing to Provenship
 
-Thanks for your interest! Shipwright is a small, focused project — an orchestration skill plus a
+Thanks for your interest! Provenship is a small, focused project — an orchestration skill plus a
 pinned set of vendored sub-skills.
 
 ## Ground rules
 
-- **Don't hand-edit vendored skills.** Everything under `skills/` *except* `skills/shipwright/` is a
+- **Don't hand-edit vendored skills.** Everything under `skills/` *except* `skills/provenship/` is a
   pinned upstream copy. Fixes to those belong upstream (superpowers / andrej-karpathy-skills); pull
   them back in with `scripts/sync-vendored.sh`.
-- **The workflow itself** lives in `skills/shipwright/SKILL.md` and `skills/shipwright/cost-table.py`.
+- **The workflow itself** lives in `skills/provenship/SKILL.md` and `skills/provenship/cost-table.py`.
   That's the place for pipeline changes.
 - **Run the checks before opening a PR:** `bash scripts/lint.sh` (the same checks CI runs).
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Per-stage token & cost table for Shipwright Finalize reports.
+"""Per-stage token & cost table for Provenship Finalize reports.
 
 Reconstructs token usage and cost per workflow stage by reading the project's
 Claude Code session transcripts (JSONL) and bucketing each message by the stage
@@ -21,7 +21,7 @@ markers, only the most recent transcript is used.
 
 PRICING is DYNAMIC: per model, rates are looked up from LiteLLM's community price
 list (the source `ccusage` also uses), fetched once and cached for 24h under
-~/.cache/shipwright/. Any model not in the live data (e.g. a brand-new id) falls
+~/.cache/provenship/. Any model not in the live data (e.g. a brand-new id) falls
 back to the bundled static table below. Token counts are EXACT (straight from the
 transcript); dollar costs are best-effort estimates — sanity-check against `/cost`.
 The header prints which pricing source was used for each model.
@@ -43,7 +43,7 @@ LITELLM_URL = (
     "https://raw.githubusercontent.com/BerriAI/litellm/main/"
     "model_prices_and_context_window.json"
 )
-CACHE_PATH = Path.home() / ".cache" / "shipwright" / "model_prices.json"
+CACHE_PATH = Path.home() / ".cache" / "provenship" / "model_prices.json"
 CACHE_TTL = timedelta(hours=24)
 FETCH_TIMEOUT = 10  # seconds
 
@@ -100,7 +100,7 @@ def _read_cache() -> tuple[dict | None, timedelta | None]:
 
 
 def _fetch_pricing() -> dict:
-    req = urllib.request.Request(LITELLM_URL, headers={"User-Agent": "shipwright-cost-table"})
+    req = urllib.request.Request(LITELLM_URL, headers={"User-Agent": "provenship-cost-table"})
     with urllib.request.urlopen(req, timeout=FETCH_TIMEOUT) as resp:  # noqa: S310 (fixed https url)
         raw = resp.read().decode("utf-8")
     data = json.loads(raw)

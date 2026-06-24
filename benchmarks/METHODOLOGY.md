@@ -1,6 +1,6 @@
 # Benchmark methodology
 
-How Shipwright measures the effect of its minimal-code build discipline without fabricating numbers.
+How Provenship measures the effect of its minimal-code build discipline without fabricating numbers.
 
 ## The claim we make — and the one we don't
 

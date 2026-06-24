@@ -14,7 +14,7 @@ set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$HERE/.." && pwd)"
-COST_TABLE="$REPO_ROOT/skills/shipwright/cost-table.py"
+COST_TABLE="$REPO_ROOT/skills/provenship/cost-table.py"
 DISCIPLINE="$HERE/discipline-prompt.md"
 RAW="$HERE/results/raw"
 

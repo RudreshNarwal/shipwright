@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Re-sync the vendored skills from their upstream repos and re-apply the shipwright: namespace.
+# Re-sync the vendored skills from their upstream repos and re-apply the provenship: namespace.
 # Usage: scripts/sync-vendored.sh [SUPERPOWERS_REF] [KARPATHY_REF] [FRONTEND_DESIGN_REF]
 #   refs default to the pinned versions below; pass a tag/branch/sha to bump.
 set -euo pipefail
@@ -45,9 +45,9 @@ cp -R "$tmp/cpp/plugins/frontend-design/skills/frontend-design" "$SKILLS_DIR/fro
 # frontend-design is Apache-2.0 — preserve its license text alongside the MIT ones.
 cp "$tmp/cpp/plugins/frontend-design/LICENSE" "$LICENSES_DIR/frontend-design.LICENSE"
 
-# Re-namespace every vendored file (NOT the main shipwright skill — it's already correct).
-find "$SKILLS_DIR" -type f -not -path "$SKILLS_DIR/shipwright/*" \
+# Re-namespace every vendored file (NOT the main provenship skill — it's already correct).
+find "$SKILLS_DIR" -type f -not -path "$SKILLS_DIR/provenship/*" \
   \( -name "*.md" -o -name "*.dot" -o -name "*.ts" -o -name "*.js" -o -name "*.cjs" -o -name "*.sh" -o -name "*.html" \) -print0 \
-  | xargs -0 perl -pi -e 's/andrej-karpathy-skills:karpathy-guidelines/shipwright:karpathy-guidelines/g; s/superpowers:/shipwright:/g'
+  | xargs -0 perl -pi -e 's/andrej-karpathy-skills:karpathy-guidelines/provenship:karpathy-guidelines/g; s/superpowers:/provenship:/g'
 
 echo "Re-synced. Update the version pins and date in VENDORED.md, then run the linter."

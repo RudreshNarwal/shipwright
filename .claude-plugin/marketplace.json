@@ -1,15 +1,15 @@
 {
-  "name": "shipwright",
+  "name": "provenship",
   "owner": {
     "name": "RudreshNarwal"
   },
   "metadata": {
-    "description": "Shipwright — drive a requirement end-to-end to a reviewed, QA'd, shipped PR.",
+    "description": "Provenship — drive a requirement end-to-end to a reviewed, QA'd, shipped PR.",
     "version": "0.1.0"
   },
   "plugins": [
     {
-      "name": "shipwright",
+      "name": "provenship",
       "source": "./",
       "description": "End-to-end development pipeline with evidence-rich finalize and ship.",
       "version": "0.1.0",

@@ -63,7 +63,7 @@ digraph process {
     "Read plan, extract all tasks with full text, note context, create TodoWrite" [shape=box];
     "More tasks remain?" [shape=diamond];
     "Dispatch final code reviewer subagent for entire implementation" [shape=box];
-    "Use shipwright:finishing-a-development-branch" [shape=box style=filled fillcolor=lightgreen];
+    "Use provenship:finishing-a-development-branch" [shape=box style=filled fillcolor=lightgreen];
 
     "Read plan, extract all tasks with full text, note context, create TodoWrite" -> "Dispatch implementer subagent (./implementer-prompt.md)";
     "Dispatch implementer subagent (./implementer-prompt.md)" -> "Implementer subagent asks questions?";
@@ -82,7 +82,7 @@ digraph process {
     "Mark task complete in TodoWrite" -> "More tasks remain?";
     "More tasks remain?" -> "Dispatch implementer subagent (./implementer-prompt.md)" [label="yes"];
     "More tasks remain?" -> "Dispatch final code reviewer subagent for entire implementation" [label="no"];
-    "Dispatch final code reviewer subagent for entire implementation" -> "Use shipwright:finishing-a-development-branch";
+    "Dispatch final code reviewer subagent for entire implementation" -> "Use provenship:finishing-a-development-branch";
 }
 ```
 
@@ -267,13 +267,13 @@ Done!
 ## Integration
 
 **Required workflow skills:**
-- **shipwright:using-git-worktrees** - Ensures isolated workspace (creates one or verifies existing)
-- **shipwright:writing-plans** - Creates the plan this skill executes
-- **shipwright:requesting-code-review** - Code review template for reviewer subagents
-- **shipwright:finishing-a-development-branch** - Complete development after all tasks
+- **provenship:using-git-worktrees** - Ensures isolated workspace (creates one or verifies existing)
+- **provenship:writing-plans** - Creates the plan this skill executes
+- **provenship:requesting-code-review** - Code review template for reviewer subagents
+- **provenship:finishing-a-development-branch** - Complete development after all tasks
 
 **Subagents should use:**
-- **shipwright:test-driven-development** - Subagents follow TDD for each task
+- **provenship:test-driven-development** - Subagents follow TDD for each task
 
 **Alternative workflow:**
-- **shipwright:executing-plans** - Use for parallel session instead of same-session execution
+- **provenship:executing-plans** - Use for parallel session instead of same-session execution

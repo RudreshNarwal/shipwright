@@ -1,9 +1,9 @@
 ---
-name: shipwright
-description: Use when the user invokes /shipwright, says "run shipwright", "ship this end-to-end", or "run my pipeline", or hands over a feature/bugfix requirement to be driven end-to-end without further supervision.
+name: provenship
+description: Use when the user invokes /provenship, says "run provenship", "ship this end-to-end", or "run my pipeline", or hands over a feature/bugfix requirement to be driven end-to-end without further supervision.
 ---
 
-# Shipwright
+# Provenship
 
 ## Overview
 
@@ -16,7 +16,7 @@ finish, then move on. Do not paraphrase a phase instead of invoking its skill. S
 
 ## When to use
 
-- `/shipwright`, "run shipwright", "ship this end-to-end", "run my pipeline".
+- `/provenship`, "run provenship", "ship this end-to-end", "run my pipeline".
 - Any non-trivial feature or bugfix you want driven through the full disciplined sequence.
 - Skip for trivial one-liners or pure questions.
 
@@ -34,25 +34,25 @@ Don't redo phases whose output already exists. Artifacts in repo conventions (e.
 
 ## Phase 0 — Preflight (run once, before anything)
 
-Shipwright bundles its superpowers, karpathy, and frontend-design sub-skills (vendored under
-`shipwright:`), but the browser-QA and ship phases call **gstack**, which is a separate product and
+Provenship bundles its superpowers, karpathy, and frontend-design sub-skills (vendored under
+`provenship:`), but the browser-QA and ship phases call **gstack**, which is a separate product and
 cannot be bundled. Before starting, verify the external dependency:
 
 - **gstack** — required for Phases 5–6 (`/qa`, `/qa-only`, `/browse`, `/design-review`, `/autoplan`,
   `/ship`, `/setup-browser-cookies`). A SessionStart hook (`hooks/hooks.json` →
   `scripts/preflight-gstack.sh`) already auto-detects it at session start and, when missing, prints the
-  install command (or background-installs it if `SHIPWRIGHT_AUTO_INSTALL_GSTACK=1`). Re-check here
+  install command (or background-installs it if `PROVENSHIP_AUTO_INSTALL_GSTACK=1`). Re-check here
   (e.g. `~/.claude/skills/gstack/` exists, or `/qa` resolves); still missing → tell the user to run
   `scripts/install-gstack.sh` (it bootstraps Bun + gstack + Playwright) and STOP until it's installed.
 - **frontend-design** — required only for `web/` / UI work, and it's now **bundled** (vendored under
-  `shipwright:frontend-design`), so there is nothing to install for UI work.
+  `provenship:frontend-design`), so there is nothing to install for UI work.
 
 If the dependency is genuinely unavailable and cannot be installed (e.g. no network in a sandbox),
 say so plainly and stop — do not silently skip QA or ship.
 
 ## Discipline — applies to every phase
 
-**INVOKE `shipwright:karpathy-guidelines` at workflow start** (whatever the entry point) so the full
+**INVOKE `provenship:karpathy-guidelines` at workflow start** (whatever the entry point) so the full
 rules are in context — the summary below is a reminder, not a substitute.
 
 - **Don't assume.** State assumptions explicitly. Multiple interpretations → present them, never pick
@@ -61,10 +61,10 @@ rules are in context — the summary below is a reminder, not a substitute.
 - **Simplicity first.** Minimum code that solves the problem. Nothing speculative.
 - **Surgical changes.** Touch only what the task requires. Mention unrelated issues; don't fix them.
 - **Goal-driven.** Every phase ends with its Verify check — apply
-  `shipwright:verification-before-completion` (show evidence, never claim done without it). Don't
+  `provenship:verification-before-completion` (show evidence, never claim done without it). Don't
   advance until it passes.
 - **Bugs get root-caused.** Any test failure or bug you can't explain at a glance (in Build or QA) →
-  `shipwright:systematic-debugging`. No guess-fixes.
+  `provenship:systematic-debugging`. No guess-fixes.
 
 ## Autonomy gate (asked once, right after Phase 1)
 
@@ -103,21 +103,21 @@ Autonomous mode removes *questions to the user*, not harness permissions — pai
 
 **Before each phase's work, record a stage marker** (see Cost tracking).
 
-1. **Brainstorm** — invoke `shipwright:brainstorming`. Ask everything needed up-front, in one
+1. **Brainstorm** — invoke `provenship:brainstorming`. Ask everything needed up-front, in one
    batch. *Verify:* spec written at `docs/superpowers/specs/YYYY-MM-DD-<topic>.md` (or the repo's
    convention) and approved. Then ask the **Autonomy gate** question (below).
-2. **Plan** — invoke `shipwright:writing-plans` to produce the plan file, then review the plan:
+2. **Plan** — invoke `provenship:writing-plans` to produce the plan file, then review the plan:
    autonomous mode → gstack `/autoplan` (runs the CEO/design/eng/DX review lenses over the plan
    with auto-decisions and hardens it; accept its recommendations at its final gate); interactive
    mode → the user reviews, invoking `/autoplan` or individual `/plan-*-review` skills only on
    request. *Verify:* plan file exists with independently executable tasks.
-3. **Build** — invoke `shipwright:subagent-driven-development` for ALL implementation (tiny plan of
-   2–3 sequential tasks → `shipwright:executing-plans` in-session instead). Within it:
-   - Every task follows `shipwright:test-driven-development`. Repo has no test runner → bootstrap a
+3. **Build** — invoke `provenship:subagent-driven-development` for ALL implementation (tiny plan of
+   2–3 sequential tasks → `provenship:executing-plans` in-session instead). Within it:
+   - Every task follows `provenship:test-driven-development`. Repo has no test runner → bootstrap a
      minimal one for the new code (e.g. pytest for Django, vitest for Vue; smoke-level is enough).
      Only if setup would dwarf the feature itself, record an explicit no-harness exception that
      Finalize must surface.
-   - Frontend tasks (components, pages, styling, `web/`) also invoke `shipwright:frontend-design`.
+   - Frontend tasks (components, pages, styling, `web/`) also invoke `provenship:frontend-design`.
    - **Every subagent prompt MUST embed the karpathy discipline** — fresh subagents don't inherit
      this context. Tell each implementer: state your assumptions in your report; if the task is
      ambiguous, return the question instead of guessing; minimum code; touch only what the task
@@ -129,8 +129,8 @@ Autonomous mode removes *questions to the user*, not harness permissions — pai
        (6) **Only then** write the minimal working solution. Never trade away security,
        accessibility, or data-loss safety to climb a rung — those are not optional.
    *Verify:* all plan tasks complete, tests green.
-4. **Review** — invoke `shipwright:requesting-code-review`; act on findings via
-   `shipwright:receiving-code-review`. Optionally gstack `/review` or `/codex` for a second
+4. **Review** — invoke `provenship:requesting-code-review`; act on findings via
+   `provenship:receiving-code-review`. Optionally gstack `/review` or `/codex` for a second
    opinion. *Verify:* blocking findings fixed.
 5. **QA — browser, UI AND API** — invoke gstack `/qa` (test-and-fix loop) against the running dev
    server. Mandatory on top of `/qa` defaults:
@@ -153,7 +153,7 @@ Triage **every** QA finding into one class and take its route:
 | Class | Route |
 |---|---|
 | **Local bug (FE or BE)** — fixable within the current plan/scope | Fix in place via `/qa` loop. Cosmetic visual → `/design-review` in-place fix. (Current behavior.) |
-| **Architecture / eng flaw** — fixing it means changing the plan, not just the code | **Loop back to Phase 2** for the affected slice: `shipwright:writing-plans` + `/plan-eng-review` (or `/autoplan`), then re-Build (3) → re-Review (4) → re-QA (5) **that slice only**. |
+| **Architecture / eng flaw** — fixing it means changing the plan, not just the code | **Loop back to Phase 2** for the affected slice: `provenship:writing-plans` + `/plan-eng-review` (or `/autoplan`), then re-Build (3) → re-Review (4) → re-QA (5) **that slice only**. |
 | **Design / UX flaw beyond cosmetic** — the interaction model or layout is fundamentally off | **Loop back to Phase 2** via `/plan-design-review`, then re-Build the affected UI. (Distinct from the in-place `/design-review`.) |
 | **Product / scope flaw** — QA shows we built the wrong thing, or the spec itself is wrong | **Loop back to Phase 1** to re-scope via `/plan-ceo-review`. This is a scope change. |
 
@@ -175,12 +175,12 @@ Triage **every** QA finding into one class and take its route:
   `{"stage": "2. Plan (re-entry: QA escalation)", ...}`) to `.claude/finalize-stages.jsonl`, and the
   finalize report records: finding → route taken → what changed.
 
-**REQUIRED SUB-SKILLS:** `shipwright:brainstorming`, `shipwright:writing-plans`,
-`shipwright:test-driven-development`, `shipwright:subagent-driven-development`,
-`shipwright:requesting-code-review`, `shipwright:receiving-code-review`,
-`shipwright:executing-plans`, `shipwright:systematic-debugging`,
-`shipwright:verification-before-completion`, `shipwright:finishing-a-development-branch`,
-`shipwright:karpathy-guidelines`, `shipwright:frontend-design`, and gstack `/qa`, `/qa-only`,
+**REQUIRED SUB-SKILLS:** `provenship:brainstorming`, `provenship:writing-plans`,
+`provenship:test-driven-development`, `provenship:subagent-driven-development`,
+`provenship:requesting-code-review`, `provenship:receiving-code-review`,
+`provenship:executing-plans`, `provenship:systematic-debugging`,
+`provenship:verification-before-completion`, `provenship:finishing-a-development-branch`,
+`provenship:karpathy-guidelines`, `provenship:frontend-design`, and gstack `/qa`, `/qa-only`,
 `/browse`, `/design-review`, `/autoplan`, `/ship`, `/land-and-deploy`, `/setup-browser-cookies`.
 
 ## Phase 6 — Enhanced Finalize
@@ -221,7 +221,7 @@ Goal: durable proof the branch was checked thoroughly, then ship.
    branch is `main` (or `master`), that is the base. Never merge into a branch other than the one the
    feature was created from. Then merge via gstack `/land-and-deploy` (merge PR into `<base>`, wait for
    CI/deploy, verify production health); for a local merge or no remote, use
-   `shipwright:finishing-a-development-branch`.
+   `provenship:finishing-a-development-branch`.
    - **Interactive mode:** present the finalize report + PR link and ask an explicit **"Merge to
      `<base>` now?"**. Yes → merge; No → stop, leave the PR open, report it as awaiting manual merge.
    - **Autonomous mode:** merge automatically — no confirmation. Stop only if a hard gate already
@@ -269,7 +269,7 @@ No per-phase cost API exists, so attribute it from session transcripts:
 
 - **Interactive (default):** follow each sub-skill's natural checkpoints.
 - **Headless back-half** (after a plan exists): run with a scoped `.claude/settings.json` allowlist:
-  `claude -p "Run /shipwright from the plan in <file>"`. Use `--dangerously-skip-permissions`
+  `claude -p "Run /provenship from the plan in <file>"`. Use `--dangerously-skip-permissions`
   only as a last resort in a sandboxed/throwaway environment. Wrap with `/loop` or `/schedule` to recur.
 
 ## Common mistakes
