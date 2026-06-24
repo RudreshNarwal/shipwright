@@ -1,12 +1,12 @@
 {
-  "name": "shipwright",
+  "name": "provenship",
   "description": "End-to-end development pipeline: brainstorm -> plan -> build (TDD, subagents) -> review -> browser QA (UI + API) -> evidence-rich finalize -> ship. Hand it a requirement, get back a PR with proof.",
   "version": "0.1.0",
   "author": {
     "name": "Rudresh Narwal"
   },
-  "homepage": "https://github.com/RudreshNarwal/shipwright",
-  "repository": "https://github.com/RudreshNarwal/shipwright",
+  "homepage": "https://github.com/RudreshNarwal/provenship",
+  "repository": "https://github.com/RudreshNarwal/provenship",
   "license": "MIT",
   "keywords": [
     "workflow",

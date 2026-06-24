@@ -1,6 +1,6 @@
-# Shipwright benchmarks
+# Provenship benchmarks
 
-A control-vs-treatment harness that measures the effect of Shipwright's **minimal-code build
+A control-vs-treatment harness that measures the effect of Provenship's **minimal-code build
 discipline** (the ponytail-style decision ladder + Karpathy's simplicity rules) on the code an agent
 produces — honestly, with no fabricated numbers.
 

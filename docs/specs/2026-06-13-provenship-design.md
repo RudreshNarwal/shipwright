@@ -1,10 +1,10 @@
-# Shipwright — Open-Source Design Spec
+# Provenship — Open-Source Design Spec
 
 **Date:** 2026-06-13 · **Author:** Rudresh Narwal (with Claude) · **Status:** Approved
 
 ## Goal
 
-Open-source Rudy's private `/rudys-workflow` skill as **Shipwright** — a self-contained,
+Open-source Rudy's private `/rudys-workflow` skill as **Provenship** — a self-contained,
 installable Claude Code plugin that drives a feature/bugfix end-to-end:
 brainstorm → plan → build (TDD, subagents) → review → browser QA (UI + API) →
 evidence-rich finalize (report, screenshots, per-stage cost table) → ship (PR).
@@ -15,8 +15,8 @@ The pitch: *"Hand it a requirement, get back a PR with proof."*
 
 | Decision | Choice |
 |---|---|
-| Name | `shipwright` (a shipwright builds ships — disciplined building that always ends in shipping) |
-| Repo | `github.com/RudreshNarwal/shipwright` (personal account) |
+| Name | `provenship` (a provenship builds ships — disciplined building that always ends in shipping) |
+| Repo | `github.com/RudreshNarwal/provenship` (personal account) |
 | License | MIT |
 | Distribution | Both: Claude Code plugin (one-command install) AND copy-able `skills/` folder |
 | Dependencies | Vendor superpowers (MIT, Jesse Vincent) + karpathy-guidelines (MIT, forrestchang). gstack CANNOT be vendored (1 GB Bun/TypeScript product with compiled `browse` CLI) → declared dependency with Phase-0 preflight + bundled installer script |
@@ -26,12 +26,12 @@ The pitch: *"Hand it a requirement, get back a PR with proof."*
 ## Repo layout
 
 ```
-shipwright/
+provenship/
 ├── .claude-plugin/
-│   ├── plugin.json              # name: shipwright, MIT, author RudreshNarwal
-│   └── marketplace.json         # enables /plugin marketplace add RudreshNarwal/shipwright
+│   ├── plugin.json              # name: provenship, MIT, author RudreshNarwal
+│   └── marketplace.json         # enables /plugin marketplace add RudreshNarwal/provenship
 ├── skills/
-│   ├── shipwright/
+│   ├── provenship/
 │   │   ├── SKILL.md             # the main workflow (ported from rudys-workflow)
 │   │   └── cost-table.py
 │   ├── brainstorming/           # ┐
@@ -66,16 +66,16 @@ shipwright/
 
 ## Components
 
-### 1. Main skill (`skills/shipwright/SKILL.md`)
+### 1. Main skill (`skills/provenship/SKILL.md`)
 
 Port of `~/.claude/skills/rudys-workflow/SKILL.md` with these changes ONLY (behavior
 identical — same 6 phases, autonomy gate, credentials flow, cost tracking):
 
-- Frontmatter `name: shipwright`; description triggers updated (`/shipwright`,
-  "run shipwright", plus the end-to-end requirement trigger). Description stays
+- Frontmatter `name: provenship`; description triggers updated (`/provenship`,
+  "run provenship", plus the end-to-end requirement trigger). Description stays
   triggers-only — never summarize the workflow in it (CSO rule).
-- All `superpowers:<skill>` references → `shipwright:<skill>` (vendored copies).
-- `andrej-karpathy-skills:karpathy-guidelines` → `shipwright:karpathy-guidelines`.
+- All `superpowers:<skill>` references → `provenship:<skill>` (vendored copies).
+- `andrej-karpathy-skills:karpathy-guidelines` → `provenship:karpathy-guidelines`.
 - gstack references unchanged (`/qa`, `/browse`, `/autoplan`, `/ship`, …) but gated
   by a new **Phase 0 — Preflight** section: verify gstack is installed
   (`~/.claude/skills/gstack/` exists or `/qa` resolvable); if missing, print
@@ -91,15 +91,15 @@ identical — same 6 phases, autonomy gate, credentials flow, cost tracking):
   karpathy-skills 1.0.0 plugin cache). VENDORED.md records upstream GitHub repos for
   future syncs.
 - Copy each skill directory WHOLE (supporting files like `visual-companion.md` included).
-- Rewrite internal cross-references: `superpowers:X` → `shipwright:X`.
+- Rewrite internal cross-references: `superpowers:X` → `provenship:X`.
   References to skills we do NOT vendor (e.g. optional `elements-of-style:…`) stay as-is —
   they are "if available" optional in upstream text.
 - Frontmatter `name:` fields stay as upstream (plugin namespace supplies the prefix).
 
 ### 3. Cross-reference / namespace policy
 
-- Plugin install (primary path): skills resolve as `shipwright:<name>` — unambiguous even
-  if the user also has real superpowers installed. No collision: shipwright always invokes
+- Plugin install (primary path): skills resolve as `provenship:<name>` — unambiguous even
+  if the user also has real superpowers installed. No collision: provenship always invokes
   its own namespace; vendored copies are pinned snapshots (documented in VENDORED.md).
 - Copy install (secondary path): bare-name resolution applies; if the user has superpowers
   installed, bare names may resolve to their own copies — acceptable (functionally
@@ -119,8 +119,8 @@ identical — same 6 phases, autonomy gate, credentials flow, cost tracking):
 ### 5. Launch kit
 
 - **README.md** (the marketing asset): one-paragraph pitch; 6-phase flow diagram (ASCII or
-  mermaid); install path A (`/plugin marketplace add RudreshNarwal/shipwright` →
-  `/plugin install shipwright`) and path B (clone + copy `skills/` into `~/.claude/skills/`);
+  mermaid); install path A (`/plugin marketplace add RudreshNarwal/provenship` →
+  `/plugin install provenship`) and path B (clone + copy `skills/` into `~/.claude/skills/`);
   Requirements (Claude Code, gstack + its Bun requirement, frontend-design plugin optional);
   the autonomy-gate pitch; link to the example report; attribution section crediting
   superpowers (Jesse Vincent), gstack (Garry Tan), karpathy-guidelines (forrestchang) with repo links.
@@ -135,7 +135,7 @@ identical — same 6 phases, autonomy gate, credentials flow, cost tracking):
    missing/present, namespace resolution of vendored sub-skills, autonomy gate.
 2. CI linter green (no dangling upstream namespaces).
 3. Clean-machine install test: add the repo as a local marketplace, install the plugin,
-   confirm `shipwright` + vendored skills appear and `/shipwright` triggers.
+   confirm `provenship` + vendored skills appear and `/provenship` triggers.
 4. `cost-table.py` smoke test against a synthetic transcript (existing test approach).
 
 ## Out of scope

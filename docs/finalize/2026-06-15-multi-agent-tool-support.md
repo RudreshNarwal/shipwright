@@ -4,7 +4,7 @@
 
 ## Task-done summary
 
-Make Shipwright (previously a Claude-Code-only plugin) **installable on Codex and OpenCode**, scoped
+Make Provenship (previously a Claude-Code-only plugin) **installable on Codex and OpenCode**, scoped
 to lightweight install adapters that reuse the existing `skills/` — no skill-body changes — with an
 honest capability matrix in the README. Pi/Gemini adapters, IDE rule files, and any port of the
 gstack QA/ship phases or `cost-table.py` were explicitly out of scope (confirmed with the user).
@@ -15,7 +15,7 @@ gstack QA/ship phases or `cost-table.py` were explicitly out of scope (confirmed
 |---|---|
 | `.codex-plugin/plugin.json` *(new)* | Codex manifest mirroring `.claude-plugin/plugin.json` + `"skills": "./skills/"` + an `interface` block (displayName, capabilities, default prompts, icon). |
 | `opencode.json` *(new)* | OpenCode config pointing at the plugin below. |
-| `.opencode/plugins/shipwright.mjs` *(new)* | Thin OpenCode plugin: on `session.created` runs `scripts/preflight-gstack.sh` and surfaces its output — gstack-preflight parity with the Claude Code SessionStart hook. Injects **no** ruleset (Shipwright has none). |
+| `.opencode/plugins/provenship.mjs` *(new)* | Thin OpenCode plugin: on `session.created` runs `scripts/preflight-gstack.sh` and surfaces its output — gstack-preflight parity with the Claude Code SessionStart hook. Injects **no** ruleset (Provenship has none). |
 | `README.md` | "Other harnesses — Codex & OpenCode" install section; **capability matrix**; corrected the FAQ that wrongly said Codex lacks a skill+subagent model. |
 | `scripts/lint.sh` | JSON-validity check extended to the two new manifests; added a `node --check` for the `.mjs`, guarded to skip when `node` is absent. |
 | `CLAUDE.md` | Repo-layout map updated with the three new paths. |
@@ -50,7 +50,7 @@ gstack QA/ship phases or `cost-table.py` were explicitly out of scope (confirmed
 - **OpenCode plugin API** (`export default async () => ({ event })`, `session.created`) was modeled on
   current OpenCode docs and the reviewer's verification of the event list, but not executed in a live
   OpenCode instance.
-- The remote `git@github.com:RudreshNarwal/shipwright.git` exists and accepts PRs (the CLAUDE.md note
+- The remote `git@github.com:RudreshNarwal/provenship.git` exists and accepts PRs (the CLAUDE.md note
   saying "remote does not exist yet" is stale — PRs #1–#3 are already merged).
 
 ## Checked thoroughly
@@ -66,7 +66,7 @@ matrix rather than hidden.
 The adapters are **unverified end-to-end** — verifying them requires Codex and OpenCode installed,
 which isn't possible in this environment. Documented manual steps to close this:
 - **Codex:** `codex plugin marketplace add <clone>` → `/plugins` install → `/hooks` trust the
-  SessionStart hook → confirm `shipwright` + vendored skills load; confirm `${CLAUDE_PLUGIN_ROOT}`
+  SessionStart hook → confirm `provenship` + vendored skills load; confirm `${CLAUDE_PLUGIN_ROOT}`
   resolves in `hooks/hooks.json` (if not, make the hook path portable).
 - **OpenCode:** run from a checkout with `opencode.json` present → confirm the plugin loads, the
   gstack preflight prints on session start, and `skills/` are discoverable.

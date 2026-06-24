@@ -1,6 +1,6 @@
-// shipwright — OpenCode plugin.
+// provenship — OpenCode plugin.
 //
-// Shipwright is an orchestrator, not a ruleset injector: it has no rules to
+// Provenship is an orchestrator, not a ruleset injector: it has no rules to
 // inject into the system prompt (unlike, say, ponytail). OpenCode discovers the
 // `skills/` in this checkout on its own. So this plugin does exactly one thing —
 // it gives OpenCode the same gstack dependency check that Claude Code gets from
@@ -9,7 +9,7 @@
 // ship) are available.
 //
 // Add it to your opencode.json:
-//   { "plugin": ["./.opencode/plugins/shipwright.mjs"] }
+//   { "plugin": ["./.opencode/plugins/provenship.mjs"] }
 
 import { execFile } from 'child_process';
 import { fileURLToPath } from 'url';
@@ -38,7 +38,7 @@ export default async () => {
       if (event?.type !== 'session.created') return;
       announced = true;
       const message = await runPreflight();
-      if (message) console.log(`[shipwright] ${message}`);
+      if (message) console.log(`[provenship] ${message}`);
     },
   };
 };

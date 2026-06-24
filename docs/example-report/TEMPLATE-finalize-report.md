@@ -1,6 +1,6 @@
 # Finalize report — TEMPLATE
 
-> 📋 **This is a template, not a captured run.** It shows the *shape* of the report Shipwright's
+> 📋 **This is a template, not a captured run.** It shows the *shape* of the report Provenship's
 > Phase 6 writes to `docs/finalize/YYYY-MM-DD-<branch-slug>.md` (`<branch-slug>` = branch name with
 > `/` replaced by `-`). Every value is a `<placeholder>` —
 > nothing here is invented or measured. A real run fills these in from actual tests, gstack `/qa`,

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Shipwright self-checks — run locally and in CI. Exits non-zero on any failure.
+# Provenship self-checks — run locally and in CI. Exits non-zero on any failure.
 set -uo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 fail=0
@@ -11,10 +11,10 @@ else
   echo "OK"
 fi
 
-echo "==> 2. Every shipwright:<skill> reference resolves to a bundled skill dir"
+echo "==> 2. Every provenship:<skill> reference resolves to a bundled skill dir"
 missing=0
-for ref in $(grep -rhoE "shipwright:[a-z-]+" "$ROOT/skills" | sort -u); do
-  name="${ref#shipwright:}"
+for ref in $(grep -rhoE "provenship:[a-z-]+" "$ROOT/skills" | sort -u); do
+  name="${ref#provenship:}"
   if [ ! -d "$ROOT/skills/$name" ]; then
     echo "FAIL: dangling reference $ref (no skills/$name/)"; missing=1; fail=1
   fi
@@ -22,7 +22,7 @@ done
 [ "$missing" -eq 0 ] && echo "OK"
 
 echo "==> 3. cost-table.py compiles"
-if python3 -m py_compile "$ROOT/skills/shipwright/cost-table.py" 2>/tmp/sw_py; then
+if python3 -m py_compile "$ROOT/skills/provenship/cost-table.py" 2>/tmp/sw_py; then
   echo "OK"
 else
   echo "FAIL:"; cat /tmp/sw_py; fail=1
@@ -36,7 +36,7 @@ else
 fi
 
 echo "==> 5. Main skill has no personal references"
-if grep -rin "rudy" "$ROOT/skills/shipwright" >/tmp/sw_rudy 2>/dev/null; then
+if grep -rin "rudy" "$ROOT/skills/provenship" >/tmp/sw_rudy 2>/dev/null; then
   echo "FAIL: personal references remain:"; cat /tmp/sw_rudy; fail=1
 else
   echo "OK"
@@ -44,7 +44,7 @@ fi
 
 echo "==> 6. OpenCode plugin parses (skipped if node absent)"
 if command -v node >/dev/null 2>&1; then
-  if node --check "$ROOT/.opencode/plugins/shipwright.mjs" 2>/tmp/sw_mjs; then
+  if node --check "$ROOT/.opencode/plugins/provenship.mjs" 2>/tmp/sw_mjs; then
     echo "OK"
   else
     echo "FAIL:"; cat /tmp/sw_mjs; fail=1

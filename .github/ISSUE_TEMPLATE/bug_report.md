@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Something in the Shipwright pipeline didn't work as documented
+about: Something in the Provenship pipeline didn't work as documented
 title: "[bug] "
 labels: bug
 ---
@@ -11,7 +11,7 @@ labels: bug
 
 **What you expected**
 
-**Repro** (the requirement/command you handed Shipwright):
+**Repro** (the requirement/command you handed Provenship):
 
 **Environment**
 - Claude Code version:

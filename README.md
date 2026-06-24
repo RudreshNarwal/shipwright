@@ -1,20 +1,20 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.svg">
-    <img alt="Shipwright — hand it a requirement, get back a PR with proof" src="assets/logo-light.svg" width="460">
+    <img alt="Provenship — hand it a requirement, get back a PR with proof" src="assets/logo-light.svg" width="460">
   </picture>
 </p>
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-22C55E.svg"></a>
-  <a href="https://github.com/RudreshNarwal/shipwright/actions/workflows/lint.yml"><img alt="CI" src="https://github.com/RudreshNarwal/shipwright/actions/workflows/lint.yml/badge.svg"></a>
+  <a href="https://github.com/RudreshNarwal/provenship/actions/workflows/lint.yml"><img alt="CI" src="https://github.com/RudreshNarwal/provenship/actions/workflows/lint.yml/badge.svg"></a>
   <img alt="Version 0.1.0" src="https://img.shields.io/badge/version-0.1.0-0EA5A0.svg">
   <img alt="Claude Code plugin" src="https://img.shields.io/badge/Claude%20Code-plugin-0F172A.svg">
 </p>
 
 <p align="center"><b>Hand it a requirement, get back a PR with proof.</b></p>
 
-**Shipwright** is a [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skill that drives a
+**Provenship** is a [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skill that drives a
 feature or bugfix from one sentence to a shipped pull request — through a disciplined, end-to-end
 pipeline that brainstorms, plans, builds with TDD, reviews, runs browser QA against the **real API**,
 writes an evidence-rich finalize report, and opens the PR. It runs interactively, or **fully
@@ -30,9 +30,9 @@ every subagent prompt.
 
 ---
 
-## 🏗️ The Shipwright pipeline
+## 🏗️ The Provenship pipeline
 
-Shipwright doesn't just write code — it runs a strict engineering lifecycle, every time:
+Provenship doesn't just write code — it runs a strict engineering lifecycle, every time:
 
 ```
 [🧠 Brainstorm] ➔ [📋 Plan] ➔ [🧪 TDD Build] ➔ [🔍 Review] ➔ [🌐 Browser+API QA] ➔ [📊 Finalize] ➔ [🚀 PR]
@@ -54,7 +54,7 @@ Shipwright doesn't just write code — it runs a strict engineering lifecycle, e
   passes a soft gate, and opens a structured, review-ready pull request.
 
 <p align="center">
-  <img alt="Shipwright pipeline — requirement through preflight, brainstorm, plan, build, review, QA, finalize, to a PR with proof, with a Phase-5 escalation loop back to plan/brainstorm" src="assets/flow.svg" width="560">
+  <img alt="Provenship pipeline — requirement through preflight, brainstorm, plan, build, review, QA, finalize, to a PR with proof, with a Phase-5 escalation loop back to plan/brainstorm" src="assets/flow.svg" width="560">
 </p>
 
 <details>
@@ -67,16 +67,16 @@ requirement
 [0] Preflight ──── verify gstack is installed (superpowers + karpathy + frontend-design are bundled)
     │
     ▼
-[1] Brainstorm ─── shipwright:brainstorming → approved spec          ◀─┐
+[1] Brainstorm ─── provenship:brainstorming → approved spec          ◀─┐
     │              └─▶ Autonomy gate: "run autonomously?" + QA creds   │
     ▼                                                                  │ re-scope
-[2] Plan ───────── shipwright:writing-plans (+ /autoplan when auto)  ◀─┤
+[2] Plan ───────── provenship:writing-plans (+ /autoplan when auto)  ◀─┤
     │                                                                  │ re-plan / re-design
     ▼                                                                  │
-[3] Build ──────── shipwright:subagent-driven-development · TDD · shipwright:frontend-design for UI
+[3] Build ──────── provenship:subagent-driven-development · TDD · provenship:frontend-design for UI
     │              karpathy discipline embedded in every subagent prompt
     ▼                                                                  │
-[4] Review ─────── shipwright:requesting-code-review + receiving-code-review (+ /review, /codex)
+[4] Review ─────── provenship:requesting-code-review + receiving-code-review (+ /review, /codex)
     │                                                                  │
     ▼                                                                  │
 [5] QA ─────────── gstack /qa · browse network (API 2xx) · console --errors · /design-review
@@ -91,7 +91,7 @@ requirement
 
 </details>
 
-Already have a spec or a plan? Shipwright's **entry map** starts you at the right phase instead of
+Already have a spec or a plan? Provenship's **entry map** starts you at the right phase instead of
 redoing finished work. And when Phase 5 surfaces a finding bigger than a local fix, it **loops back**
 to the phase that owns it (re-plan or re-design that slice) instead of patching forward.
 
@@ -105,20 +105,20 @@ installs both for you.
 ### 📦 Option A — plugin (recommended)
 
 ```
-/plugin marketplace add RudreshNarwal/shipwright
-/plugin install shipwright
+/plugin marketplace add RudreshNarwal/provenship
+/plugin install provenship
 ```
 
 That's it for the bundled skills. gstack is the one dependency that can't be bundled — on the next
-session, Shipwright **auto-detects** whether it's installed and prints a one-line install command if
+session, Provenship **auto-detects** whether it's installed and prints a one-line install command if
 it's missing. To install it (one command — also brings Bun + Playwright):
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/RudreshNarwal/shipwright/main/scripts/install-gstack.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/RudreshNarwal/provenship/main/scripts/install-gstack.sh)
 # …or, from a clone:  bash scripts/install-gstack.sh
 ```
 
-**Auto-install (opt-in):** set `SHIPWRIGHT_AUTO_INSTALL_GSTACK=1` and Shipwright installs gstack for
+**Auto-install (opt-in):** set `PROVENSHIP_AUTO_INSTALL_GSTACK=1` and Provenship installs gstack for
 you in the background on session start (idempotent; re-run the command above if it's interrupted).
 It's opt-in by design — it downloads ~1 GB plus a browser, so we don't do it silently without your
 say-so.
@@ -126,9 +126,9 @@ say-so.
 ### 📂 Option B — copy the skills
 
 ```bash
-git clone https://github.com/RudreshNarwal/shipwright.git
-cp -R shipwright/skills/* ~/.claude/skills/
-bash shipwright/scripts/install-gstack.sh        # installs Bun + gstack + Playwright
+git clone https://github.com/RudreshNarwal/provenship.git
+cp -R provenship/skills/* ~/.claude/skills/
+bash provenship/scripts/install-gstack.sh        # installs Bun + gstack + Playwright
 ```
 
 The bootstrapper (`scripts/install-gstack.sh`) is idempotent and installs, in order: **Bun** (if
@@ -138,23 +138,23 @@ if it's still missing.
 
 ### 🤖 Other harnesses — Codex & OpenCode
 
-Shipwright is built and verified on Claude Code, but the front half of the pipeline runs anywhere with
+Provenship is built and verified on Claude Code, but the front half of the pipeline runs anywhere with
 a real skill + subagent model. Two adapters ship in the repo so it installs cleanly:
 
 **Codex** — `.codex-plugin/plugin.json` reuses the same `skills/`:
 
 ```
-codex plugin marketplace add RudreshNarwal/shipwright
+codex plugin marketplace add RudreshNarwal/provenship
 ```
 
-Then in Codex open `/plugins`, select the Shipwright marketplace, and install Shipwright. Open
+Then in Codex open `/plugins`, select the Provenship marketplace, and install Provenship. Open
 `/hooks`, review and trust its SessionStart hook (the gstack preflight check), and start a new thread.
 
 **OpenCode** — run from a checkout of this repo (the plugin reuses its `skills/` and `scripts/`), and
 add to `opencode.json`:
 
 ```json
-{ "plugin": ["./.opencode/plugins/shipwright.mjs"] }
+{ "plugin": ["./.opencode/plugins/provenship.mjs"] }
 ```
 
 The plugin runs the gstack preflight on session start; OpenCode is expected to discover the bundled
@@ -179,10 +179,10 @@ run Phases 1–4 and ship by hand. ² `cost-table.py` reads Claude Code session 
 ### 🚀 Run it
 
 ```
-/shipwright
+/provenship
 ```
 
-…or just hand Claude a requirement and say "run this end-to-end with shipwright." After the spec is
+…or just hand Claude a requirement and say "run this end-to-end with provenship." After the spec is
 approved you'll be asked once whether to continue autonomously and for any QA login credentials
 (leave blank and it self-registers a throwaway test account against non-prod targets).
 
@@ -193,7 +193,7 @@ run made, and the per-stage cost table.
 ## ⚡ What makes the output different
 
 - **API-level QA, not just screenshots.** Phase 5 runs `browse network` after every key flow — a
-  pretty UI that silently 4xx/5xx's is a bug, and Shipwright catches it.
+  pretty UI that silently 4xx/5xx's is a bug, and Provenship catches it.
 - **Evidence, not vibes.** Every run ends with a committed finalize report: health score,
   screenshots, the assumptions it made, and a per-stage token/cost table.
 - **Autonomous when you want it.** Answer one question after brainstorming and it runs to a PR with
@@ -224,9 +224,9 @@ Same agent, same requirement — the difference is what shows up in the pull req
 
 ## 📊 The numbers
 
-Shipwright doesn't ship fabricated benchmarks. The numbers here come from a real benchmark harness
+Provenship doesn't ship fabricated benchmarks. The numbers here come from a real benchmark harness
 ([`benchmarks/`](./benchmarks/)) that runs a control-vs-treatment experiment — the same model and
-tasks, with Shipwright's minimal-code build discipline injected into the treatment arm only — and
+tasks, with Provenship's minimal-code build discipline injected into the treatment arm only — and
 records what actually happened. They land here once the harness banks enough runs to clear its
 publish gate (N ≥ 10 per arm across the suite, with matched pass-rates).
 
@@ -246,7 +246,7 @@ are no numbers worth quoting — and don't quote any.
 
 ## 📦 What's bundled
 
-Shipwright vendors a pinned, permissively-licensed snapshot of the skills it orchestrates (all MIT,
+Provenship vendors a pinned, permissively-licensed snapshot of the skills it orchestrates (all MIT,
 plus one Apache-2.0 skill — `frontend-design`), so it installs as one self-contained plugin. gstack is
 the exception — it's a separate product you install once. Full provenance and versions are in
 [`VENDORED.md`](./VENDORED.md).
@@ -254,15 +254,15 @@ the exception — it's a separate product you install once. Full provenance and 
 ## ❓ FAQ
 
 **How is this different from just running a coding agent?**
-A normal agent gives you a diff and a summary. Shipwright drives a fixed six-phase pipeline
+A normal agent gives you a diff and a summary. Provenship drives a fixed six-phase pipeline
 (brainstorm → plan → build with TDD → review → browser + API QA → finalize) and hands back a PR with
 proof: per-feature screenshots, evidence the real API calls returned 2xx, the assumptions it made,
 and a per-stage cost table. When QA finds a bug bigger than a local fix, it backs up and re-plans
 that slice instead of patching forward.
 
 **Is it affiliated with Anthropic?**
-No. Shipwright is an independent, community plugin *for* Claude Code. "Claude" and "Claude Code" are
-trademarks of Anthropic; Shipwright is not built, owned, or endorsed by them.
+No. Provenship is an independent, community plugin *for* Claude Code. "Claude" and "Claude Code" are
+trademarks of Anthropic; Provenship is not built, owned, or endorsed by them.
 
 **Does it work without gstack?**
 Partly. Phases 1–4 (brainstorm, plan, build, review) run on the bundled superpowers/karpathy skills
@@ -270,12 +270,12 @@ and need no gstack. Phases 5–6 (browser + API QA, design review, ship) call gs
 Phase 0 stops and tells you to install it. You can still run the front half and ship by hand.
 
 **Can I start mid-pipeline?**
-Yes. Shipwright has an entry map: hand it an approved spec and it starts at Plan; hand it a plan and
+Yes. Provenship has an entry map: hand it an approved spec and it starts at Plan; hand it a plan and
 it starts at Build; hand it finished code and it starts at Review. It won't redo work whose artifact
 already exists.
 
 **What's the autonomy gate?**
-After the spec is approved, Shipwright asks once: run the rest autonomously, and any QA login
+After the spec is approved, Provenship asks once: run the rest autonomously, and any QA login
 credentials. Say yes and it runs to a PR with zero further prompts — taking the safer interpretation
 at each fork and logging it. The only things that still stop an autonomous run are missing
 credentials, a failed soft gate, and a genuine "we built the wrong thing" scope flaw (which always
@@ -291,7 +291,7 @@ Never. QA credentials live in a gitignored file; only the finalize report and sc
 committed, with secrets redacted.
 
 **Does it work on Codex, OpenCode, or other agent tools?**
-Shipwright is built and verified on Claude Code, but **Codex and OpenCode both have a real skill +
+Provenship is built and verified on Claude Code, but **Codex and OpenCode both have a real skill +
 subagent model**, so the front half of the pipeline rides those skills. Adapters for both ship in the
 repo — see [Other harnesses](#-other-harnesses--codex--opencode) and the
 [capability matrix](#-capability-matrix) for install steps and exactly what runs where. In short:
@@ -304,7 +304,7 @@ equivalent skill + subagent model.
 
 ## 🙏 Credits
 
-Shipwright stands on the shoulders of several excellent open-source projects:
+Provenship stands on the shoulders of several excellent open-source projects:
 
 - **[superpowers](https://github.com/obra/superpowers)** by Jesse Vincent (MIT) — brainstorming,
   planning, TDD, subagent-driven development, code review, debugging, verification.
@@ -316,11 +316,11 @@ Shipwright stands on the shoulders of several excellent open-source projects:
   by Anthropic (Apache-2.0) — the frontend design skill used for UI work.
 - **[ponytail](https://github.com/DietrichGebert/ponytail)** by DietrichGebert (MIT) —
   *inspiration, not bundled.* Its explicit "does this need to exist / stdlib / platform / existing
-  dep / one line" build ladder shaped the checklist Shipwright injects into each Build-phase prompt.
+  dep / one line" build ladder shaped the checklist Provenship injects into each Build-phase prompt.
 
 ## 📄 License & attribution
 
-Shipwright itself is **MIT © 2026 Rudresh Narwal**.
+Provenship itself is **MIT © 2026 Rudresh Narwal**.
 
 It bundles, verbatim and version-pinned, skills under two permissive licenses — **MIT** (superpowers,
 andrej-karpathy-skills) and **Apache-2.0** (`frontend-design`, © Anthropic). Each upstream's full
@@ -329,5 +329,5 @@ license text is preserved in [`licenses/`](./licenses/), and provenance is docum
 relicense it.
 
 > **Not affiliated with Anthropic.** "Claude" and "Claude Code" are trademarks of Anthropic.
-> Shipwright is an independent, community plugin *for* Claude Code — it is not built, owned, or
+> Provenship is an independent, community plugin *for* Claude Code — it is not built, owned, or
 > endorsed by Anthropic.

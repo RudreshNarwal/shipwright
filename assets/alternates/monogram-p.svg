@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Provenship — monogram P concept">
+  <!-- ALTERNATE CONCEPT B: monogram "P" (Provenship) standing on a waterline — the stem as a mast,
+       the bowl as a sail. -->
+  <defs>
+    <linearGradient id="sw-p" x1="14" y1="56" x2="50" y2="8" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0EA5A0"/>
+      <stop offset="1" stop-color="#22C55E"/>
+    </linearGradient>
+  </defs>
+  <path d="M20 50 L20 15 L34 15 C 46 15, 46 33, 34 33 L20 33"
+        fill="none" stroke="url(#sw-p)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <g stroke="#0EA5A0" stroke-linecap="round" opacity="0.45">
+    <line x1="10" y1="58" x2="26" y2="58" stroke-width="3"/>
+    <line x1="32" y1="58" x2="46" y2="58" stroke-width="3"/>
+  </g>
+</svg>

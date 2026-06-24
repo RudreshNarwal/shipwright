@@ -1,10 +1,10 @@
-# CLAUDE.md — Shipwright
+# CLAUDE.md — Provenship
 
 Guidance for Claude Code working in this repository.
 
 ## What this is
 
-**Shipwright** is an open-source [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
+**Provenship** is an open-source [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
 plugin that drives a feature/bugfix end-to-end: brainstorm → plan → build (TDD, subagents) →
 review → browser QA (UI **and** real API calls) → evidence-rich finalize (report + screenshots +
 per-stage cost table) → ship (PR). It can run interactively or fully autonomously from a single
@@ -18,20 +18,20 @@ Pitch: *"Hand it a requirement, get back a PR with proof."*
 
 ## Origin & relationship to the private skill
 
-Shipwright is the public, open-source build of a private personal skill called **`rudys-workflow`**
+Provenship is the public, open-source build of a private personal skill called **`rudys-workflow`**
 that lives at `~/.claude/skills/rudys-workflow/` on the author's machine. **That private skill is the
-source of truth for the author's own use and must NOT be modified by work in this repo.** Shipwright
+source of truth for the author's own use and must NOT be modified by work in this repo.** Provenship
 is a renamed, genericized, self-contained copy intended for public distribution.
 
-When porting changes from `rudys-workflow` → here: rename to `shipwright`, strip personal paths
-(`~/.claude/skills/rudys-workflow/...`), and rewrite skill namespaces to `shipwright:` (see below).
+When porting changes from `rudys-workflow` → here: rename to `provenship`, strip personal paths
+(`~/.claude/skills/rudys-workflow/...`), and rewrite skill namespaces to `provenship:` (see below).
 
 ## Locked decisions (from brainstorming, 2026-06-13)
 
 | Decision | Choice | Why |
 |---|---|---|
-| Name | `shipwright` | A shipwright builds ships — disciplined building that always ends in shipping. `/shipwright` reads well as a command. |
-| Repo | `github.com/RudreshNarwal/shipwright` (personal account) | It's the author's workflow/brand; portable. |
+| Name | `provenship` | A provenship builds ships — disciplined building that always ends in shipping. `/provenship` reads well as a command. |
+| Repo | `github.com/RudreshNarwal/provenship` (personal account) | It's the author's workflow/brand; portable. |
 | License | MIT (repo) | Bundled skills are permissive: MIT, plus one Apache-2.0 (`frontend-design`). Apache-2.0 is redistributable inside an MIT repo with its license text preserved — no incompatible copyleft is mixed in. |
 | Distribution | Plugin **and** copy-able `skills/` folder | One-command install for most; copy path for the rest. |
 | Dependencies | Vendor superpowers + karpathy (MIT) **and frontend-design (Apache-2.0)** — all pure markdown. **Do NOT vendor gstack.** | gstack is a ~1 GB Bun/TypeScript product (compiled `browse` CLI + Chrome extension) — vendoring = forking a live product forever. |
@@ -42,14 +42,14 @@ When porting changes from `rudys-workflow` → here: rename to `shipwright`, str
 ```
 .claude-plugin/
   plugin.json          # the plugin definition (name, version, MIT, author)
-  marketplace.json     # makes `/plugin marketplace add RudreshNarwal/shipwright` work
+  marketplace.json     # makes `/plugin marketplace add RudreshNarwal/provenship` work
 .codex-plugin/
   plugin.json          # Codex adapter — reuses skills/ (`codex plugin marketplace add ...`); trust the SessionStart hook via /hooks
 opencode.json          # OpenCode adapter — points at the .opencode plugin below
 .opencode/
-  plugins/shipwright.mjs # thin OpenCode plugin: runs the gstack preflight on session start
+  plugins/provenship.mjs # thin OpenCode plugin: runs the gstack preflight on session start
 skills/
-  shipwright/          # THE MAIN WORKFLOW — this is the project's own code
+  provenship/          # THE MAIN WORKFLOW — this is the project's own code
     SKILL.md           # the 6-phase pipeline + Phase-0 preflight + autonomy gate
     cost-table.py      # per-stage token/cost attribution from session transcripts
   <11 vendored skills> # pinned upstream copies — DO NOT hand-edit (see below)
@@ -71,15 +71,15 @@ README.md  CONTRIBUTING.md  LICENSE  .gitignore
 
 ## The vendoring model (most important thing to understand)
 
-Everything under `skills/` **except `skills/shipwright/`** is a pinned, verbatim copy of an upstream
+Everything under `skills/` **except `skills/provenship/`** is a pinned, verbatim copy of an upstream
 permissively-licensed skill (MIT, or Apache-2.0 for `frontend-design`), with one mechanical
 transformation applied: skill cross-references are re-namespaced from
-the upstream prefix to `shipwright:` so they resolve to the bundled copies regardless of what else the
+the upstream prefix to `provenship:` so they resolve to the bundled copies regardless of what else the
 user has installed.
 
-- `superpowers:<x>` → `shipwright:<x>`
-- `andrej-karpathy-skills:karpathy-guidelines` → `shipwright:karpathy-guidelines`
-- `frontend-design` → referenced as `shipwright:frontend-design`; its own SKILL.md has **no** skill
+- `superpowers:<x>` → `provenship:<x>`
+- `andrej-karpathy-skills:karpathy-guidelines` → `provenship:karpathy-guidelines`
+- `frontend-design` → referenced as `provenship:frontend-design`; its own SKILL.md has **no** skill
   cross-references, so the rewrite is a no-op on it (the reference rename lives in the main skill).
 - `elements-of-style:<x>` → **left untouched** (optional, not vendored; upstream treats it as "if available")
 - Bare-word "superpowers" with no colon (e.g. `~/.config/superpowers/worktrees/`,
@@ -98,7 +98,7 @@ user has installed.
   Apache-2.0 license is preserved in `licenses/frontend-design.LICENSE`.
 
 `using-git-worktrees` is included because it's transitively referenced by the others; the reference
-closure was verified (no dangling `shipwright:` refs).
+closure was verified (no dangling `provenship:` refs).
 
 **gstack is NOT bundled.** It's a declared runtime dependency, checked in the skill's Phase 0 and
 installed via `scripts/install-gstack.sh`. Used in Phases 5–6 (`/qa`, `/qa-only`, `/browse`,
@@ -109,7 +109,7 @@ installed via `scripts/install-gstack.sh`. Used in Phases 5–6 (`/qa`, `/qa-onl
 - **Never hand-edit a vendored skill.** Fixes belong upstream; pull them back with
   `scripts/sync-vendored.sh <superpowers-ref> <karpathy-ref> <frontend-design-ref>`, then update the
   version pins + date in `VENDORED.md` and run `scripts/lint.sh`.
-- **The workflow itself** is `skills/shipwright/SKILL.md` + `cost-table.py`. That's where pipeline
+- **The workflow itself** is `skills/provenship/SKILL.md` + `cost-table.py`. That's where pipeline
   changes go.
 - `SKILL.md` is a **discipline-enforcing skill**. Its `description:` frontmatter must be
   **triggers-only** — NEVER summarize the workflow there (Claude follows the summary and skips reading
@@ -117,7 +117,7 @@ installed via `scripts/install-gstack.sh`. Used in Phases 5–6 (`/qa`, `/qa-onl
   behavior, make the minimal change, confirm it holds).
 - **Always run `bash scripts/lint.sh` before committing.** It is the same suite CI runs:
   1. no upstream namespaces left in `skills/`
-  2. every `shipwright:<x>` reference resolves to a bundled dir
+  2. every `provenship:<x>` reference resolves to a bundled dir
   3. `cost-table.py` compiles
   4. JSON manifests are valid
   5. no personal references ("rudy") in the main skill
@@ -126,11 +126,11 @@ installed via `scripts/install-gstack.sh`. Used in Phases 5–6 (`/qa`, `/qa-onl
 
 ## How the main skill works (quick map)
 
-`skills/shipwright/SKILL.md` defines:
+`skills/provenship/SKILL.md` defines:
 - **Entry map** — start at the right phase if a spec/plan/code already exists (don't redo finished work).
 - **Phase 0 — Preflight** — verify gstack installed (superpowers/karpathy/frontend-design are bundled);
   stop with install instructions if gstack is missing.
-- **Discipline** — invoke `shipwright:karpathy-guidelines` at start; rules apply to every phase.
+- **Discipline** — invoke `provenship:karpathy-guidelines` at start; rules apply to every phase.
 - **Autonomy gate** (asked once, after Phase 1) — "run autonomously?" + QA credentials. Yes → zero
   further questions, recommended defaults table, safer-interpretation-logged on ambiguity.
 - **6 phases** — Brainstorm, Plan, Build, Review, QA (UI + API via `browse network`), Finalize+Ship.
@@ -159,7 +159,7 @@ installed via `scripts/install-gstack.sh`. Used in Phases 5–6 (`/qa`, `/qa-onl
 - **Not pushed to GitHub**; name not yet claimed/verified on GitHub or the plugin marketplaces.
 - **Plugin install not yet end-to-end tested** — manifests are schema-valid and match known-good
   installed plugins, but `/plugin marketplace add` against a local clone hasn't been run to confirm
-  Claude Code loads `shipwright` + the vendored skills. Closing this is the main pre-launch gap.
+  Claude Code loads `provenship` + the vendored skills. Closing this is the main pre-launch gap.
 
 ## Conventions
 
