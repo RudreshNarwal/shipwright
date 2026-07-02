@@ -7,6 +7,14 @@ All notable changes to Provenship are documented here. The format is based on
 ## [Unreleased]
 
 ### Added
+- **`/autoplan` refinement triggers in Phases 1–2.** A spec that's still under-refined after
+  brainstorming is flagged so Plan hardens it via gstack `/autoplan`, and interactive mode now
+  proactively offers `/autoplan` (one line) when the plan is thin or carries open decisions — no
+  longer only on request. The autonomous path is unchanged (it already auto-runs it).
+- **Optional `/office-hours` hook in Phase 1.** When the input is a raw, unvalidated product idea
+  (not a defined feature) and gstack is installed, Provenship pressure-tests what's worth building
+  via gstack `/office-hours` before brainstorming how. One conditional line, not a new phase —
+  Phases 1–4 stay gstack-free on Codex/OpenCode.
 - **Multi-harness install adapters (Codex + OpenCode).** Provenship now ships a `.codex-plugin/plugin.json`
   (Codex reuses the same `skills/`) and an `opencode.json` + `.opencode/plugins/provenship.mjs` (a thin
   plugin that runs the gstack preflight on session start). The README gains a Codex/OpenCode install
@@ -53,6 +61,12 @@ All notable changes to Provenship are documented here. The format is based on
 - **Brand & visual identity** — SVG logo (hull-that-resolves-into-a-checkmark), light/dark lockups,
   square icon, and README badges.
 - Open-source launch files: `SECURITY.md`, `CHANGELOG.md`, and a pull-request template.
+
+### Changed
+- **README pipeline diagram is now dark-themed.** `assets/flow.svg` was recolored (same geometry,
+  colors only) so it reads on GitHub dark mode, where the light version's slate header/wordmark
+  vanished. Badge numbers and the end pill flipped to dark slate for contrast on the brighter
+  teal→green gradient (matching `logo-dark.svg`).
 
 ## [0.1.0] - 2026-06-13
 

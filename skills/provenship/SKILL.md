@@ -39,7 +39,7 @@ Provenship bundles its superpowers, karpathy, and frontend-design sub-skills (ve
 cannot be bundled. Before starting, verify the external dependency:
 
 - **gstack** — required for Phases 5–6 (`/qa`, `/qa-only`, `/browse`, `/design-review`, `/autoplan`,
-  `/ship`, `/setup-browser-cookies`). A SessionStart hook (`hooks/hooks.json` →
+  `/ship`, `/setup-browser-cookies`; optional-use: `/office-hours` in Phase 1). A SessionStart hook (`hooks/hooks.json` →
   `scripts/preflight-gstack.sh`) already auto-detects it at session start and, when missing, prints the
   install command (or background-installs it if `PROVENSHIP_AUTO_INSTALL_GSTACK=1`). Re-check here
   (e.g. `~/.claude/skills/gstack/` exists, or `/qa` resolves); still missing → tell the user to run
@@ -103,14 +103,21 @@ Autonomous mode removes *questions to the user*, not harness permissions — pai
 
 **Before each phase's work, record a stage marker** (see Cost tracking).
 
-1. **Brainstorm** — invoke `provenship:brainstorming`. Ask everything needed up-front, in one
+1. **Brainstorm** — requirement is a raw, unvalidated product idea (not yet a defined feature) and
+   gstack is installed → run gstack `/office-hours` first (startup or builder mode) to pressure-test
+   what's worth building; skip it when the requirement is already defined. Then invoke
+   `provenship:brainstorming`. Ask everything needed up-front, in one
    batch. *Verify:* spec written at `docs/superpowers/specs/YYYY-MM-DD-<topic>.md` (or the repo's
-   convention) and approved. Then ask the **Autonomy gate** question (below).
+   convention) and approved. If the approved spec still feels under-refined — open design decisions,
+   fuzzy edges — don't carry it forward raw: flag it so Phase 2 runs `/autoplan` to harden the plan
+   (interactive mode included). Then ask the **Autonomy gate** question (below).
 2. **Plan** — invoke `provenship:writing-plans` to produce the plan file, then review the plan:
    autonomous mode → gstack `/autoplan` (runs the CEO/design/eng/DX review lenses over the plan
    with auto-decisions and hardens it; accept its recommendations at its final gate); interactive
-   mode → the user reviews, invoking `/autoplan` or individual `/plan-*-review` skills only on
-   request. *Verify:* plan file exists with independently executable tasks.
+   mode → the user reviews, invoking `/autoplan` or individual `/plan-*-review` skills on request —
+   but when the plan needs hardening (thin, many open decisions, or flagged shaky from Phase 1),
+   offer `/autoplan` in one line and run it. *Verify:* plan file exists with independently
+   executable tasks.
 3. **Build** — invoke `provenship:subagent-driven-development` for ALL implementation (tiny plan of
    2–3 sequential tasks → `provenship:executing-plans` in-session instead). Within it:
    - Every task follows `provenship:test-driven-development`. Repo has no test runner → bootstrap a
@@ -181,7 +188,8 @@ Triage **every** QA finding into one class and take its route:
 `provenship:executing-plans`, `provenship:systematic-debugging`,
 `provenship:verification-before-completion`, `provenship:finishing-a-development-branch`,
 `provenship:karpathy-guidelines`, `provenship:frontend-design`, and gstack `/qa`, `/qa-only`,
-`/browse`, `/design-review`, `/autoplan`, `/ship`, `/land-and-deploy`, `/setup-browser-cookies`.
+`/browse`, `/design-review`, `/autoplan`, `/ship`, `/land-and-deploy`, `/setup-browser-cookies`
+(optional: `/office-hours`).
 
 ## Phase 6 — Enhanced Finalize
 

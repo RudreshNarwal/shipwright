@@ -6,3 +6,4 @@ __pycache__/
 .claude/finalize-stages.jsonl
 # Internal GTM/strategy copy at repo root — grab it, then delete; never publish (states the moat honestly).
 /GTM.md
+.gstack/
